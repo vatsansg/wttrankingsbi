@@ -24,26 +24,26 @@
 from pyspark.sql import functions as F
 
 ALL_BRONZE_TABLES = [
-    "{catalog_name}.{bronze_schema}.ranking_individuals",
-    "{catalog_name}.{bronze_schema}.ranking_pairs",
-    "{catalog_name}.{bronze_schema}.players_events_results_master",
-    "{catalog_name}.{bronze_schema}.players_events_results_master_log",
-    "{catalog_name}.{bronze_schema}.players_events_results_master_log_archives",
-    "{catalog_name}.{bronze_schema}.individuals_event_penalties",
-    "{catalog_name}.{bronze_schema}.ref_countries",
-    "{catalog_name}.{bronze_schema}.ref_continents",
-    "{catalog_name}.{bronze_schema}.ref_age_categories",
-    "{catalog_name}.{bronze_schema}.ref_categories",
-    "{catalog_name}.{bronze_schema}.ref_ranking_categories",
-    "{catalog_name}.{bronze_schema}.ref_subevent_types",
-    "{catalog_name}.{bronze_schema}.ref_subevents_codes",
-    "{catalog_name}.{bronze_schema}.ref_subevents_codes_description",
-    "{catalog_name}.{bronze_schema}.ref_subevent_dependent_categories",
-    "{catalog_name}.{bronze_schema}.ref_organization",
-    "{catalog_name}.{bronze_schema}.ref_event_type_general",
-    "{catalog_name}.{bronze_schema}.ref_result_position",
-    "{catalog_name}.{bronze_schema}.competitors",
-    "{catalog_name}.{bronze_schema}.players_doubles"
+    f"{catalog_name}.{bronze_schema}.ranking_individuals",
+    f"{catalog_name}.{bronze_schema}.ranking_pairs",
+    f"{catalog_name}.{bronze_schema}.players_events_results_master",
+    f"{catalog_name}.{bronze_schema}.players_events_results_master_log",
+    f"{catalog_name}.{bronze_schema}.players_events_results_master_log_archives",
+    f"{catalog_name}.{bronze_schema}.individuals_event_penalties",
+    f"{catalog_name}.{bronze_schema}.ref_countries",
+    f"{catalog_name}.{bronze_schema}.ref_continents",
+    f"{catalog_name}.{bronze_schema}.ref_age_categories",
+    f"{catalog_name}.{bronze_schema}.ref_categories",
+    f"{catalog_name}.{bronze_schema}.ref_ranking_categories",
+    f"{catalog_name}.{bronze_schema}.ref_subevent_types",
+    f"{catalog_name}.{bronze_schema}.ref_subevents_codes",
+    f"{catalog_name}.{bronze_schema}.ref_subevents_codes_description",
+    f"{catalog_name}.{bronze_schema}.ref_subevent_dependent_categories",
+    f"{catalog_name}.{bronze_schema}.ref_organization",
+    f"{catalog_name}.{bronze_schema}.ref_event_type_general",
+    f"{catalog_name}.{bronze_schema}.ref_result_position",
+    f"{catalog_name}.{bronze_schema}.competitors",
+    f"{catalog_name}.{bronze_schema}.players_doubles"
 ]
 
 # COMMAND ----------
