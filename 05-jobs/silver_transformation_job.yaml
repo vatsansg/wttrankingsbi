@@ -1,0 +1,113 @@
+# WTT Rankings BI -- Step 3 silver transformation job
+# Databricks Asset Bundle job-resource YAML (same schema as `databricks.yml`
+# resources.jobs.<key>) -- paste this whole file into the Databricks Jobs UI's
+# "Edit as YAML" editor to create the job. Functionally identical to
+# `silver_transformation_job.json` in this same folder -- both are generated
+# from one source (`gen_silver_job.py`) so pick whichever your workspace's
+# Create Job screen accepts.
+#
+# Notebook paths below are already set for this workspace:
+#   /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi
+# If you ever re-import step3-silver-transformation to a different workspace
+# path, update every notebook_path below (and in
+# silver_transformation_job.json) to match -- Databricks does not validate at
+# save time that a notebook_path actually exists, only that the YAML/JSON is
+# well-formed, so a stale path surfaces later as a single failed task rather
+# than an upfront error (same caveat as Step 2's job files).
+#
+# Unlike Step 2, no task here declares a `libraries` entry -- every silver
+# task reads only from Unity Catalog Delta tables (no JDBC), so there is no
+# driver to attach.
+#
+# Run this job AFTER the Step 2 bronze ingestion job has completed for the
+# week you want in Silver -- there is no cross-job dependency wired up yet
+# (that's Step 6+ orchestration); for now, run bronze, confirm it succeeded,
+# then run this one.
+
+resources:
+  jobs:
+    wtt_ranking_silver_transformation:
+      name: wtt_ranking_silver_transformation
+      queue:
+        enabled: true
+      job_clusters:
+      - job_cluster_key: silver_job_cluster
+        new_cluster:
+          spark_version: 15.4.x-scala2.12
+          node_type_id: Standard_DS3_v2
+          num_workers: 1
+          autoscale:
+            min_workers: 1
+            max_workers: 2
+          data_security_mode: SINGLE_USER
+      tasks:
+      - task_key: build_player_identity_dimension
+        job_cluster_key: silver_job_cluster
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/03-silver/01.Build Player Identity Dimension
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: silver_ranking_individuals
+        job_cluster_key: silver_job_cluster
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/03-silver/02.Silver Ranking Individuals
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+        depends_on:
+        - task_key: build_player_identity_dimension
+      - task_key: silver_ranking_pairs
+        job_cluster_key: silver_job_cluster
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/03-silver/03.Silver Ranking Pairs
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+        depends_on:
+        - task_key: build_player_identity_dimension
+      - task_key: silver_points_ledger
+        job_cluster_key: silver_job_cluster
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/03-silver/04.Silver Points Ledger
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+        depends_on:
+        - task_key: build_player_identity_dimension
+      - task_key: silver_individuals_event_penalties
+        job_cluster_key: silver_job_cluster
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/03-silver/05.Silver Individuals Event Penalties
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+        depends_on:
+        - task_key: build_player_identity_dimension
+      - task_key: silver_reference_tables
+        for_each_task:
+          inputs: '["ref_countries", "ref_continents", "ref_age_categories", "ref_categories", "ref_ranking_categories", "ref_subevent_types", "ref_subevents_codes", "ref_subevents_codes_description", "ref_subevent_dependent_categories", "ref_organization", "ref_event_type_general", "ref_result_position"]'
+          concurrency: 6
+          task:
+            task_key: silver_reference_tables_iteration
+            job_cluster_key: silver_job_cluster
+            notebook_task:
+              notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/03-silver/06.Silver Reference Table (Generic)
+              base_parameters:
+                p_table_key: '{{input}}'
+            max_retries: 2
+            min_retry_interval_millis: 60000
+            retry_on_timeout: true
+      - task_key: validate_all_silver_tables
+        job_cluster_key: silver_job_cluster
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/03-silver/07.Validate All Silver Tables
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+        depends_on:
+        - task_key: silver_ranking_individuals
+        - task_key: silver_ranking_pairs
+        - task_key: silver_points_ledger
+        - task_key: silver_individuals_event_penalties
+        - task_key: silver_reference_tables

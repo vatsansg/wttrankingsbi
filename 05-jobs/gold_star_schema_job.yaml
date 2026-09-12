@@ -1,0 +1,127 @@
+# WTT Rankings BI -- Step 4 gold star schema job
+# Databricks Asset Bundle job-resource YAML (same schema as `databricks.yml`
+# resources.jobs.<key>) -- paste this whole file into the Databricks Jobs UI's
+# "Edit as YAML" editor to create the job. Functionally identical to
+# `gold_star_schema_job.json` in this same folder -- both are generated from
+# one source (`gen_gold_job.py`) so pick whichever your workspace's Create
+# Job screen accepts.
+#
+# Notebook paths below are already set for this workspace:
+#   /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi
+# If you ever re-import step4-gold-star-schema to a different workspace path,
+# update every notebook_path below (and in gold_star_schema_job.json) to
+# match -- Databricks does not validate at save time that a notebook_path
+# actually exists, only that the YAML/JSON is well-formed, so a stale path
+# surfaces later as a single failed task rather than an upfront error (same
+# caveat as Steps 2 and 3's job files).
+#
+# No task here declares a `libraries` entry -- every gold task reads only
+# from Unity Catalog Delta tables built by Step 3, same as Step 3 itself.
+#
+# Run this job AFTER the Step 3 silver transformation job has completed --
+# there is no cross-job dependency wired up yet (that's Step 6+
+# orchestration); for now, run bronze, then silver, confirm both succeeded,
+# then run this one.
+
+resources:
+  jobs:
+    wtt_ranking_gold_star_schema:
+      name: wtt_ranking_gold_star_schema
+      queue:
+        enabled: true
+      job_clusters:
+      - job_cluster_key: gold_job_cluster
+        new_cluster:
+          spark_version: 15.4.x-scala2.12
+          node_type_id: Standard_DS3_v2
+          num_workers: 1
+          autoscale:
+            min_workers: 1
+            max_workers: 2
+          data_security_mode: SINGLE_USER
+      tasks:
+      - task_key: dim_country
+        job_cluster_key: gold_job_cluster
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/04-gold/01.Build Dim Country
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: dim_subevent
+        job_cluster_key: gold_job_cluster
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/04-gold/02.Build Dim Subevent
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: dim_age_category
+        job_cluster_key: gold_job_cluster
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/04-gold/03.Build Dim Age Category
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: dim_ranking_week
+        job_cluster_key: gold_job_cluster
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/04-gold/04.Build Dim Ranking Week
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: dim_player
+        job_cluster_key: gold_job_cluster
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/04-gold/05.Build Dim Player
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+        depends_on:
+        - task_key: dim_country
+      - task_key: dim_pair
+        job_cluster_key: gold_job_cluster
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/04-gold/06.Build Dim Pair
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+        depends_on:
+        - task_key: dim_player
+      - task_key: fact_ranking_individual
+        job_cluster_key: gold_job_cluster
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/04-gold/07.Fact Ranking Individual
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: fact_ranking_pair
+        job_cluster_key: gold_job_cluster
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/04-gold/08.Fact Ranking Pair
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: gold_dashboard_views
+        job_cluster_key: gold_job_cluster
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/04-gold/09.Gold Dashboard Views
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+        depends_on:
+        - task_key: dim_country
+        - task_key: dim_subevent
+        - task_key: dim_age_category
+        - task_key: dim_player
+        - task_key: dim_pair
+        - task_key: fact_ranking_individual
+        - task_key: fact_ranking_pair
+      - task_key: validate_all_gold_tables
+        job_cluster_key: gold_job_cluster
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/04-gold/10.Validate All Gold Tables
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+        depends_on:
+        - task_key: gold_dashboard_views
+        - task_key: dim_ranking_week
