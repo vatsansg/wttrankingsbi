@@ -11,6 +11,19 @@
 # MAGIC
 # MAGIC Intentionally lightweight, proportionate to a 17-table silver layer --
 # MAGIC not a large production test suite.
+# MAGIC
+# MAGIC **Change (2026-09-12, MainRanking historical backfill exercise):**
+# MAGIC `silver.ranking_individuals`/`ranking_pairs` are now built from *two*
+# MAGIC sources (the landing-CSV pipeline and, once loaded,
+# MAGIC `bronze.main_ranking_historical`) -- see the modified `02`/`03`
+# MAGIC notebooks. Check 4 is new: it surfaces the `_dq_source_mismatch` count
+# MAGIC (rows where both sources disagreed on rank/points for the same week, and
+# MAGIC the landing-CSV value won) as a visible data-quality signal, and prints
+# MAGIC the distinct-week count on both tables so accumulation is easy to
+# MAGIC confirm at a glance. A non-zero mismatch count is NOT a hard failure --
+# MAGIC it's exactly the kind of disagreement the progressive-week test (Phase
+# MAGIC B) exists to catch, and needs a human look rather than an automatic
+# MAGIC pass/fail.
 
 # COMMAND ----------
 
@@ -113,6 +126,17 @@ for full_table_name, key_col in null_key_checks:
 # MAGIC doesn't fail every run until the source DB extract is fixed. Tighten
 # MAGIC `PAIR_KNOWN_GAP_THRESHOLD_PCT` back down to 5.0 once that extract pulls
 # MAGIC full pair history.
+# MAGIC
+# MAGIC **`ranking_pairs` note (MainRanking backfill exercise):** a hand-check
+# MAGIC against the actual `dbo_MainRanking.csv`/`dbo_Players_Doubles.csv`
+# MAGIC extracts, before this ran for real, found MainRanking's own pair rows
+# MAGIC resolve at ~99.97% against that `players_doubles` snapshot -- i.e. the
+# MAGIC historical backfill was NOT expected to push `ranking_pairs` anywhere
+# MAGIC near the `points_ledger` PAIR gap. `ranking_pairs` is deliberately kept
+# MAGIC at the standard 5% threshold below rather than pre-emptively copying
+# MAGIC `points_ledger`'s allowance -- if this run's real numbers disagree with
+# MAGIC that hand-check, that's worth knowing about via a real failure, not
+# MAGIC hiding behind a loosened threshold.
 
 # COMMAND ----------
 
@@ -123,7 +147,7 @@ identity_resolution_checks = [
 ]
 
 UNRESOLVED_THRESHOLD_PCT = 5.0
-PAIR_KNOWN_GAP_THRESHOLD_PCT = 65.0  # explicit allowance for the documented bronze.players_doubles coverage gap (observed 59.4% + margin) -- see README
+PAIR_KNOWN_GAP_THRESHOLD_PCT = 65.0  # explicit allowance for the documented bronze.players_doubles coverage gap in points_ledger only -- see README
 
 for full_table_name in identity_resolution_checks:
     df = spark.table(full_table_name)
@@ -174,6 +198,41 @@ if unmapped_subevent_count > 0:
     )
 else:
     print(f"OK    {points_ledger_table}: no rows with an unmapped subevent_code")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC #### Check 4 (new) - MainRanking merge data-quality signals
+# MAGIC Informational, not a hard failure (see header note): the
+# MAGIC `_dq_source_mismatch` count, and the distinct-week count on both tables
+# MAGIC so accumulation across the landing-CSV and MainRanking sources is
+# MAGIC visible at a glance.
+
+# COMMAND ----------
+
+for full_table_name in [
+    f"{catalog_name}.{silver_schema}.ranking_individuals",
+    f"{catalog_name}.{silver_schema}.ranking_pairs",
+]:
+    df = spark.table(full_table_name)
+    total = df.count()
+    mismatch_count = df.filter(F.col('_dq_source_mismatch') == True).count()  # noqa: E712
+    week_count = df.select('ranking_year', 'ranking_week').distinct().count()
+    source_breakdown = (
+        df.groupBy('_source_system').count().collect()
+        if '_source_system' in df.columns else []
+    )
+    print(
+        f"INFO  {full_table_name}: {total} rows, {week_count} distinct week(s), "
+        f"{mismatch_count} source-mismatch row(s), by source: "
+        f"{ {r['_source_system']: r['count'] for r in source_breakdown} }"
+    )
+    if mismatch_count > 0:
+        print(
+            f"      ^ {mismatch_count} row(s) had disagreeing rank/points between "
+            f"LANDING_CSV and MAIN_RANKING_HISTORICAL for the same week -- the "
+            f"LANDING_CSV value won, but this should be reviewed by hand, not ignored."
+        )
 
 # COMMAND ----------
 

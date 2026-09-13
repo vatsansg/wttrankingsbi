@@ -1,13 +1,21 @@
 # Databricks notebook source
 # MAGIC %md
 # MAGIC # Validate all gold tables
-# MAGIC Final task in the gold job. Runs after every dim, fact, and the views
-# MAGIC notebook -- fails the job loudly if any of the 8 gold tables is missing,
-# MAGIC empty, has a broken business key, or (new for Gold, since this is the
-# MAGIC first layer with real star-schema joins) has fact rows whose foreign key
-# MAGIC doesn't resolve against its dimension. Same intent and same
+# MAGIC Final task in the gold job. Runs after every dim, fact, and both views
+# MAGIC notebooks (`09` snapshot views + `11` longitudinal views, added
+# MAGIC 2026-09-13) -- fails the job loudly if any of the 8 gold tables is
+# MAGIC missing, empty, has a broken business key, or (new for Gold, since this
+# MAGIC is the first layer with real star-schema joins) has fact rows whose
+# MAGIC foreign key doesn't resolve against its dimension. Same intent and same
 # MAGIC proportionate, lightweight scope as bronze's `09.Validate All Bronze
 # MAGIC Tables` and silver's `07.Validate All Silver Tables`.
+# MAGIC
+# MAGIC Check 4 below (`ALL_GOLD_VIEWS`) now covers 17 views total: the original
+# MAGIC 8 latest-week snapshots from `09` plus the 9 new full-history
+# MAGIC longitudinal views from `11` -- same `COUNT(*)` sanity check for both,
+# MAGIC since this validator only confirms a view resolves, not what it should
+# MAGIC contain (see `09`'s own note on why an FK/row-count validator can't
+# MAGIC catch a semantic scoping bug either way).
 
 # COMMAND ----------
 
@@ -39,6 +47,18 @@ ALL_GOLD_VIEWS = [
     "v_doubles_partnerships",
     "v_fresh_faces",
     "v_ranking_leaders",
+    # 2026-09-13: the 9 longitudinal views from `11.Gold Longitudinal Views`
+    # (business-analyst review, see discovery doc "Dashboard catalog" 9-17) --
+    # same row-count sanity check as the original 8, nothing view-specific.
+    "v_federation_strength_trajectory",
+    "v_continental_power_shift",
+    "v_player_career_trajectory",
+    "v_peak_rank_career_longevity",
+    "v_country_discipline_investment_trend",
+    "v_junior_to_senior_transition",
+    "v_new_entrant_retention_curve",
+    "v_doubles_partnership_longevity",
+    "v_volatility_consistency_index",
 ]
 
 # COMMAND ----------

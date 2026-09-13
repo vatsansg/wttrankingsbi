@@ -14,6 +14,13 @@
 # MAGIC     - Source File
 # MAGIC     - Ingestion Timestamp
 # MAGIC 4. Write to bronze delta table
+# MAGIC
+# MAGIC **Change (2026-09-12, MainRanking historical backfill exercise):** same
+# MAGIC accumulate-write fix as `01.Ingest Ranking Individuals Files` -- see that
+# MAGIC notebook's header and `README.md`'s "Accumulate-write fix" section for
+# MAGIC the full rationale. Was a full `mode('overwrite')` of the whole table
+# MAGIC every run; now a `replaceWhere`-scoped overwrite of just the
+# MAGIC `(RankingYear, RankingWeek)` this run loads.
 
 # COMMAND ----------
 
@@ -128,18 +135,63 @@ display(ranking_pairs_final_df)
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC #### Step 3 - Write to bronze delta table
+# MAGIC #### Step 2b - Guard against a stray/duplicate week in the incoming file
+# MAGIC Same guard as `01.Ingest Ranking Individuals Files` -- the `replaceWhere`
+# MAGIC below assumes the file(s) just read contain exactly one
+# MAGIC `(RankingYear, RankingWeek)` pair, and that it matches the widgets.
 
 # COMMAND ----------
+
+distinct_weeks = (
+    ranking_pairs_final_df
+        .select('RankingYear', 'RankingWeek')
+        .distinct()
+        .collect()
+)
+if len(distinct_weeks) != 1:
+    raise ValueError(
+        f"Expected exactly one (RankingYear, RankingWeek) in the loaded file(s), "
+        f"found {len(distinct_weeks)}: {distinct_weeks}. Refusing to write."
+    )
+loaded_year, loaded_week = distinct_weeks[0]['RankingYear'], distinct_weeks[0]['RankingWeek']
+if str(loaded_year) != str(v_ranking_year) or str(loaded_week) != str(v_ranking_week):
+    raise ValueError(
+        f"File contents ({loaded_year}, {loaded_week}) don't match the widget "
+        f"parameters ({v_ranking_year}, {v_ranking_week})."
+    )
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC #### Step 3 - Write to bronze delta table
+# MAGIC Accumulate via `replaceWhere`, same rationale as `01.Ingest Ranking
+# MAGIC Individuals Files` -- see that notebook / `README.md` for detail.
+
+# COMMAND ----------
+
+spark.conf.set('spark.databricks.delta.replaceWhere.dataColumns.enabled', 'true')
+
+replace_predicate = f"RankingYear = {int(v_ranking_year)} AND RankingWeek = {int(v_ranking_week)}"
 
 (
     ranking_pairs_final_df
         .write
         .format('delta')
         .mode('overwrite')
+        .option('replaceWhere', replace_predicate)
+        .option('mergeSchema', 'false')
         .saveAsTable(table_name)
 )
 
 # COMMAND ----------
 
 display(spark.table(table_name).count())
+
+# COMMAND ----------
+
+display(
+    spark.table(table_name)
+         .groupBy('RankingYear', 'RankingWeek')
+         .count()
+         .orderBy('RankingYear', 'RankingWeek')
+)

@@ -15,6 +15,18 @@
 # MAGIC     - Source File
 # MAGIC     - Ingestion Timestamp
 # MAGIC 4. Write to bronze delta table
+# MAGIC
+# MAGIC **Change (2026-09-12, MainRanking historical backfill exercise):** this
+# MAGIC notebook used to do a full `mode('overwrite')` of the *entire*
+# MAGIC `bronze.ranking_individuals` table every run -- fine for a single-week
+# MAGIC test, but it meant loading week 32 silently erased week 31. It now writes
+# MAGIC with `option('replaceWhere', ...)` scoped to just the
+# MAGIC `(RankingYear, RankingWeek)` pair this run is loading, so every week's
+# MAGIC data accumulates in the table instead of replacing the last one. This is
+# MAGIC a permanent change to production write semantics, not part of the
+# MAGIC one-off MainRanking exercise -- see `README.md`'s "Accumulate-write fix"
+# MAGIC section for the rationale, the explicit conf flag it depends on, and how
+# MAGIC it was verified.
 
 # COMMAND ----------
 
@@ -83,7 +95,6 @@ ranking_individuals_schema = StructType([
 
 # COMMAND ----------
 
-# DBTITLE 1,Cell 8
 individuals_sen_df = (
     spark.read
          .format('csv')
@@ -119,7 +130,6 @@ display(ranking_individuals_df)
 
 # COMMAND ----------
 
-# DBTITLE 1,Cell 10
 ranking_individuals_final_df = (
     ranking_individuals_df
         .withColumn('_ingestion_timestamp', F.current_timestamp())
@@ -129,27 +139,83 @@ display(ranking_individuals_final_df)
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC #### Step 3 - Write to bronze delta table
-# MAGIC Full overwrite for this initial/one-off load track. The incremental
-# MAGIC production track (Step 7+) switches this to a `batch_id`-partitioned
-# MAGIC `replaceWhere` overwrite, same as the Formula 1 incremental variant --
-# MAGIC that's why `batch_id` is already reserved as a metadata column in the
-# MAGIC Step 1 design even though it is unused here.
+# MAGIC #### Step 2b - Guard against a stray/duplicate week in the incoming file
+# MAGIC The whole point of the partitioned `replaceWhere` below is "this run only
+# MAGIC touches the one week it read" -- that guarantee only holds if the file we
+# MAGIC just read actually contains exactly the one `(RankingYear, RankingWeek)`
+# MAGIC pair the widgets asked for. Fail loudly rather than silently replacing
+# MAGIC the wrong partition (or a wider one than intended) if it doesn't.
 
 # COMMAND ----------
+
+distinct_weeks = (
+    ranking_individuals_final_df
+        .select('RankingYear', 'RankingWeek')
+        .distinct()
+        .collect()
+)
+if len(distinct_weeks) != 1:
+    raise ValueError(
+        f"Expected exactly one (RankingYear, RankingWeek) in the loaded file(s), "
+        f"found {len(distinct_weeks)}: {distinct_weeks}. Refusing to write -- "
+        f"the replaceWhere predicate below assumes a single week."
+    )
+loaded_year, loaded_week = distinct_weeks[0]['RankingYear'], distinct_weeks[0]['RankingWeek']
+if str(loaded_year) != str(v_ranking_year) or str(loaded_week) != str(v_ranking_week):
+    raise ValueError(
+        f"File contents ({loaded_year}, {loaded_week}) don't match the widget "
+        f"parameters ({v_ranking_year}, {v_ranking_week}) -- check the folder/"
+        f"filenames before re-running."
+    )
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC #### Step 3 - Write to bronze delta table
+# MAGIC **Accumulate, don't overwrite.** Every week's write is scoped to just
+# MAGIC that week's `(RankingYear, RankingWeek)` partition via `replaceWhere` --
+# MAGIC re-running the same week is still safe/idempotent (it just replaces that
+# MAGIC one week again), but a *different* week no longer erases the ones already
+# MAGIC there. `bronze.ranking_individuals` is not physically partitioned by
+# MAGIC these columns (row volume here -- a few thousand rows/week -- doesn't
+# MAGIC justify it); `replaceWhere` on an arbitrary (non-partition) column
+# MAGIC requires `spark.databricks.delta.replaceWhere.dataColumns.enabled`, set
+# MAGIC explicitly below rather than assumed, since this project has already hit
+# MAGIC more than one "looked right, silently wasn't" config-default bug (the
+# MAGIC JDBC `databaseName` property being the first). On the very first run
+# MAGIC ever (table doesn't exist yet), `replaceWhere` has nothing to replace and
+# MAGIC behaves like a plain create.
+
+# COMMAND ----------
+
+spark.conf.set('spark.databricks.delta.replaceWhere.dataColumns.enabled', 'true')
+
+replace_predicate = f"RankingYear = {int(v_ranking_year)} AND RankingWeek = {int(v_ranking_week)}"
 
 (
     ranking_individuals_final_df
         .write
         .format('delta')
         .mode('overwrite')
+        .option('replaceWhere', replace_predicate)
+        .option('mergeSchema', 'false')
         .saveAsTable(table_name)
 )
 
 # COMMAND ----------
 
-display(spark.table(table_name))
+display(spark.table(table_name).count())
 
 # COMMAND ----------
 
-display(spark.table(table_name).count())
+# MAGIC %md
+# MAGIC #### Step 4 - Confirm this week landed and no other week was disturbed
+
+# COMMAND ----------
+
+display(
+    spark.table(table_name)
+         .groupBy('RankingYear', 'RankingWeek')
+         .count()
+         .orderBy('RankingYear', 'RankingWeek')
+)

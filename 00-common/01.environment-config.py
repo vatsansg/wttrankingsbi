@@ -20,6 +20,28 @@ gold_schema = 'gold'
 
 # COMMAND ----------
 
+# BUGFIX (2026-09-13, caught on the real Gold Longitudinal Views run):
+# every read/write in this project already uses a fully-qualified 3-part
+# name (`{catalog_name}.{schema}.{table}` in spark.table()/.saveAsTable()/
+# SQL FROM clauses), so those never depended on the notebook's "current
+# catalog." But a handful of display-only diagnostic commands --
+# `SHOW VIEWS IN {catalog_name}.{gold_schema}` at the end of `09` and `11`
+# in 04-gold -- do depend on it: on this workspace/runtime, `SHOW VIEWS IN`
+# (and the same is true of `SHOW TABLES IN`) only accepts a catalog-
+# qualified schema name when that catalog is ALREADY the session's current
+# catalog, otherwise it fails with "target schema ... is not in the
+# current catalog." Since nothing before this line ever set a current
+# catalog, it defaulted to whatever the workspace/cluster default is
+# (commonly `hive_metastore`), which is never `wttrankingsbi`. Fixed once,
+# centrally, here -- rather than in every individual SHOW VIEWS/SHOW TABLES
+# line -- since every notebook in this project already starts with
+# `%run ../00-common/01.environment-config`, this one `USE CATALOG` makes
+# every notebook's session-wide current catalog correct from the start,
+# including any future diagnostic command that isn't 3-part-qualified.
+spark.sql(f"USE CATALOG {catalog_name}")
+
+# COMMAND ----------
+
 # Weekly landing files -- ADF drops RankingIndividuals/RankingPairs CSVs here
 # every week, under a "<year> - <week>" subfolder, same as the F1 project reads
 # a Volume of per-season files.
