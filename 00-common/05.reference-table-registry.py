@@ -14,14 +14,31 @@
 # MAGIC
 # MAGIC Generated from the same approved table design as the Step 1 Bronze Design
 # MAGIC doc, so this registry cannot drift out of sync with the reviewed schema.
+# MAGIC
+# MAGIC **BUGFIX (2026-09-13, caught by a real query against `v_continental_pulse`
+# MAGIC returning every continent field NULL):** the source database's DBA
+# MAGIC removed `Countries_TTU` -- it was consolidated into the plain `Countries`
+# MAGIC table, which is now the single source of truth. This isn't just a rename:
+# MAGIC `Countries.ContinentId` is a `varchar` holding the real 5-value continent
+# MAGIC code (`AFR`/`AME`/`ASI`/`EUR`/`OCE`) directly, matching `ref_continents`
+# MAGIC exactly -- unlike `Countries_TTU.ContinentId`, which was an unrelated
+# MAGIC integer id-space (1-22-ish, never traced to any table in the source
+# MAGIC database) that could never have joined to `ref_continents` correctly.
+# MAGIC `Countries` also has fewer columns than the old `Countries_TTU` schema
+# MAGIC (confirmed via `INFORMATION_SCHEMA.COLUMNS`) -- no `CreatedBy`,
+# MAGIC `LastModifiedBy`, `IsDeleted`, `TelCode`, or `IndividualNamingConvention`
+# MAGIC -- so the column list below is pinned to what actually exists now, not
+# MAGIC copied forward from the old table. See `01.Build Dim Country.py` (gold)
+# MAGIC for the corresponding column-list fix, and `07.silver-reference-registry`
+# MAGIC (silver) for the matching `has_is_deleted` flip to `False`.
 
 # COMMAND ----------
 
 REFERENCE_TABLES = {
     "ref_countries": {
-        "source_table": "Countries_TTU",
+        "source_table": "Countries",
         "target_table": "ref_countries",
-        "columns": ["CountryId", "CountryCode", "CountryName", "ContinentId", "IsActive", "Flag", "CreatedDateTime", "LastUpdatedDateTime", "CreatedBy", "LastModifiedBy", "IsDeleted", "TelCode", "IndividualNamingConvention"],
+        "columns": ["CountryId", "CountryCode", "CountryName", "ContinentId", "IsActive", "Flag", "CreatedDateTime", "LastUpdatedDateTime"],
     },
     "ref_continents": {
         "source_table": "Continents",

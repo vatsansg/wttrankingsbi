@@ -10,12 +10,21 @@
 # MAGIC proportionate, lightweight scope as bronze's `09.Validate All Bronze
 # MAGIC Tables` and silver's `07.Validate All Silver Tables`.
 # MAGIC
-# MAGIC Check 4 below (`ALL_GOLD_VIEWS`) now covers 17 views total: the original
-# MAGIC 8 latest-week snapshots from `09` plus the 9 new full-history
-# MAGIC longitudinal views from `11` -- same `COUNT(*)` sanity check for both,
-# MAGIC since this validator only confirms a view resolves, not what it should
-# MAGIC contain (see `09`'s own note on why an FK/row-count validator can't
-# MAGIC catch a semantic scoping bug either way).
+# MAGIC Check 4 below (`ALL_GOLD_VIEWS`) covers 17 views total: the original
+# MAGIC 8 latest-week snapshots from `09` plus the 9 full-history longitudinal
+# MAGIC views from `11` -- same `COUNT(*)` sanity check for both, since this
+# MAGIC validator only confirms a view resolves, not what it should contain (see
+# MAGIC `09`'s own note on why an FK/row-count validator can't catch a semantic
+# MAGIC scoping bug either way).
+# MAGIC
+# MAGIC **Step 8 addition (2026-09-19): Check 5, target-week-landed assertion**
+# MAGIC -- same freshness-check pattern as bronze/silver's Check 4 (see those
+# MAGIC notebooks). Confirms the target week's rows actually made it into
+# MAGIC `fact_ranking_individual`/`fact_ranking_pair`, since every check above
+# MAGIC passes on total accumulated history regardless of whether the latest
+# MAGIC week landed. On success, this is also the notebook that marks the whole
+# MAGIC batch `gold_done` in `control.batch_control` -- the last stage, so this
+# MAGIC is the row Step 10's freshness check and dashboard tile actually read.
 
 # COMMAND ----------
 
@@ -47,9 +56,6 @@ ALL_GOLD_VIEWS = [
     "v_doubles_partnerships",
     "v_fresh_faces",
     "v_ranking_leaders",
-    # 2026-09-13: the 9 longitudinal views from `11.Gold Longitudinal Views`
-    # (business-analyst review, see discovery doc "Dashboard catalog" 9-17) --
-    # same row-count sanity check as the original 8, nothing view-specific.
     "v_federation_strength_trajectory",
     "v_continental_power_shift",
     "v_player_career_trajectory",
@@ -60,6 +66,12 @@ ALL_GOLD_VIEWS = [
     "v_doubles_partnership_longevity",
     "v_volatility_consistency_index",
 ]
+
+dbutils.widgets.text("p_ranking_year", "")
+dbutils.widgets.text("p_ranking_week", "")
+v_ranking_year = dbutils.widgets.get("p_ranking_year")
+v_ranking_week = dbutils.widgets.get("p_ranking_week")
+HAVE_TARGET_WEEK = bool(v_ranking_year) and bool(v_ranking_week)
 
 # COMMAND ----------
 
@@ -107,25 +119,21 @@ for full_table_name, key_col in null_key_checks:
 
 # MAGIC %md
 # MAGIC #### Check 3 - foreign key integrity (fact -> dimension)
-# MAGIC New for Gold -- the first layer with real star-schema joins. Every FK on
-# MAGIC the fact tables is a plain carried-forward column, not a lookup (see
-# MAGIC `00-common/08.gold-helpers`) -- **except** `ittfid`, which is the one FK
-# MAGIC that depends on Silver's identity resolution having succeeded.
-# MAGIC `dim_player`/`dim_pair` only contain Silver's *resolved* identity
-# MAGIC population, while `identity_resolved = false` fact rows are a real,
-# MAGIC accepted, non-zero rate under Step 3's own thresholds (5% individuals /
-# MAGIC 65% pairs -- see the Step 3 README's pair-identity-gap finding). So only
-# MAGIC the `ittfid` checks below exclude `identity_resolved = false` rows, the
-# MAGIC same accommodation Silver already makes -- otherwise this would hard-fail
-# MAGIC the Gold job on every single run.
+# MAGIC Every FK on the fact tables is a plain carried-forward column, not a
+# MAGIC lookup (see `00-common/08.gold-helpers`) -- **except** `ittfid`, which is
+# MAGIC the one FK that depends on Silver's identity resolution having
+# MAGIC succeeded. `dim_player`/`dim_pair` only contain Silver's *resolved*
+# MAGIC identity population, while `identity_resolved = false` fact rows are a
+# MAGIC real, accepted, non-zero rate under Step 3's own thresholds (5%
+# MAGIC individuals / 65% pairs -- see the Step 3 README's pair-identity-gap
+# MAGIC finding). So only the `ittfid` checks below exclude
+# MAGIC `identity_resolved = false` rows, the same accommodation Silver already
+# MAGIC makes -- otherwise this would hard-fail the Gold job on every single run.
 # MAGIC
 # MAGIC `country_code` / `subevent_code` / `age_category_code` / `category_code`
 # MAGIC are NOT identity-dependent -- they're plain source columns present
 # MAGIC whether or not identity resolution succeeded -- so those checks
 # MAGIC deliberately run against every row, unresolved-identity rows included.
-# MAGIC Narrowing them the same way as `ittfid` would silently stop checking
-# MAGIC these FKs on the ~5-65% of rows where identity didn't resolve, masking a
-# MAGIC real dimension-snapshot mismatch on exactly that slice.
 # MAGIC
 # MAGIC A failure here means a dimension build (01-06) used a different source
 # MAGIC snapshot than the corresponding fact build (07-08) did within the same
@@ -134,9 +142,6 @@ for full_table_name, key_col in null_key_checks:
 
 # COMMAND ----------
 
-# fk_col: (fact_table, fact_col, dim_table, dim_col, identity_dependent)
-# identity_dependent=True -> exclude identity_resolved=false rows before the
-# left-anti join (ittfid only -- see note above).
 fk_checks = [
     (
         f"{catalog_name}.{gold_schema}.fact_ranking_individual", 'country_code',
@@ -194,11 +199,17 @@ for fact_table, fact_col, dim_table, dim_col, identity_dependent in fk_checks:
 
 # MAGIC %md
 # MAGIC #### Check 4 - every dashboard view resolves
-# MAGIC Views are created with `CREATE OR REPLACE VIEW` in notebook `09`, which
-# MAGIC doesn't itself catch a broken view definition (a bad column reference
-# MAGIC only surfaces when the view is queried) -- this check runs one
+# MAGIC Views are created with `CREATE OR REPLACE VIEW` in notebooks `09`/`11`,
+# MAGIC which don't themselves catch a broken view definition (a bad column
+# MAGIC reference only surfaces when the view is queried) -- this check runs one
 # MAGIC `COUNT(*)` per view so a broken view fails the job here, not silently at
-# MAGIC first dashboard load.
+# MAGIC first dashboard load. **Note for Step 10 alerting:** `09`/`11` each issue
+# MAGIC several independent `CREATE OR REPLACE VIEW` statements sequentially, so
+# MAGIC a failure partway through either one can leave some views already
+# MAGIC replaced and others stale until the next successful retry -- if this
+# MAGIC check (or `09`/`11` themselves) fails, treat it as "dashboard views may
+# MAGIC be in a mixed old/new state," not a generic job failure, per the
+# MAGIC Incremental_Load_Steps_7-11_Plan.docx review.
 
 # COMMAND ----------
 
@@ -213,11 +224,63 @@ for view_name in ALL_GOLD_VIEWS:
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC #### Result
+# MAGIC #### Check 5 - target-week-landed assertion (Step 8, freshness check)
+# MAGIC Same pattern as bronze/silver's equivalent check. Confirms the target
+# MAGIC week actually shows up as the MAX week in both fact tables -- not just
+# MAGIC "present somewhere," since a stale run that skipped the newest week
+# MAGIC while still containing older weeks should also fail this.
+
+# COMMAND ----------
+
+if HAVE_TARGET_WEEK:
+    target_year, target_week = int(v_ranking_year), int(v_ranking_week)
+    target_week_key = target_year * 100 + target_week
+    for full_table_name in [
+        f"{catalog_name}.{gold_schema}.fact_ranking_individual",
+        f"{catalog_name}.{gold_schema}.fact_ranking_pair",
+    ]:
+        max_week_key_row = (
+            spark.table(full_table_name)
+                .agg(F.max(F.col('ranking_year') * 100 + F.col('ranking_week')).alias('max_week_key'))
+                .collect()[0]
+        )
+        max_week_key = max_week_key_row['max_week_key']
+        if max_week_key is None or max_week_key < target_week_key:
+            failures.append(
+                f"{full_table_name}: target week ({target_year}, {target_week}) is not the latest "
+                f"week present (max found: {max_week_key}) -- this run did not actually land the "
+                f"week the orchestrator asked for"
+            )
+        else:
+            print(f"OK    {full_table_name}: latest week present is >= target ({target_year}, {target_week})")
+else:
+    print("INFO  p_ranking_year/p_ranking_week not supplied -- skipping Check 5 (standalone run).")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC #### Result + `control.batch_control` status update
+# MAGIC This is the last of the three validation notebooks in the chain -- a
+# MAGIC clean pass here is what marks the whole batch `gold_done`.
 
 # COMMAND ----------
 
 if failures:
+    if HAVE_TARGET_WEEK:
+        spark.sql(f"""
+            UPDATE wttrankingsbi.control.batch_control
+            SET status = 'failed', failed_at = current_timestamp(),
+                failure_stage = 'gold', failure_message = {chr(39)}{'; '.join(failures)[:4000].replace(chr(39), chr(39)+chr(39))}{chr(39)},
+                updated_at = current_timestamp()
+            WHERE ranking_year = {int(v_ranking_year)} AND ranking_week = {int(v_ranking_week)}
+        """)
     raise ValueError("Gold validation FAILED:\n" + "\n".join(f"  - {f}" for f in failures))
+
+if HAVE_TARGET_WEEK:
+    spark.sql(f"""
+        UPDATE wttrankingsbi.control.batch_control
+        SET status = 'gold_done', gold_done_at = current_timestamp(), updated_at = current_timestamp()
+        WHERE ranking_year = {int(v_ranking_year)} AND ranking_week = {int(v_ranking_week)}
+    """)
 
 print(f"Gold validation passed: {len(ALL_GOLD_TABLES)} tables + {len(ALL_GOLD_VIEWS)} views checked.")

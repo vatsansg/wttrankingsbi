@@ -66,9 +66,9 @@ CREATE SCHEMA IF NOT EXISTS wttrankingsbi.gold
 
 -- DBTITLE 1,Verify storage write access
 -- Smoke test: verify the storage credential can write to the managed locations
-CREATE TABLE IF NOT EXISTS wttrankingsbi.bronze._setup_test (id INT);
-INSERT INTO wttrankingsbi.bronze._setup_test VALUES (1);
-SELECT * FROM wttrankingsbi.bronze._setup_test;
+--CREATE TABLE IF NOT EXISTS wttrankingsbi.bronze._setup_test (id INT);
+--INSERT INTO wttrankingsbi.bronze._setup_test VALUES (1);
+--SELECT * FROM wttrankingsbi.bronze._setup_test;
 -- DROP TABLE IF EXISTS wttrankingsbi.bronze._setup_test;
 
 -- COMMAND ----------

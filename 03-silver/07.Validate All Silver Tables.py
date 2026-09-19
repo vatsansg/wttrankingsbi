@@ -12,18 +12,11 @@
 # MAGIC Intentionally lightweight, proportionate to a 17-table silver layer --
 # MAGIC not a large production test suite.
 # MAGIC
-# MAGIC **Change (2026-09-12, MainRanking historical backfill exercise):**
-# MAGIC `silver.ranking_individuals`/`ranking_pairs` are now built from *two*
-# MAGIC sources (the landing-CSV pipeline and, once loaded,
-# MAGIC `bronze.main_ranking_historical`) -- see the modified `02`/`03`
-# MAGIC notebooks. Check 4 is new: it surfaces the `_dq_source_mismatch` count
-# MAGIC (rows where both sources disagreed on rank/points for the same week, and
-# MAGIC the landing-CSV value won) as a visible data-quality signal, and prints
-# MAGIC the distinct-week count on both tables so accumulation is easy to
-# MAGIC confirm at a glance. A non-zero mismatch count is NOT a hard failure --
-# MAGIC it's exactly the kind of disagreement the progressive-week test (Phase
-# MAGIC B) exists to catch, and needs a human look rather than an automatic
-# MAGIC pass/fail.
+# MAGIC **Step 8 addition (2026-09-19): Check 4, target-week-landed assertion**
+# MAGIC -- same freshness-check pattern as bronze's Check 4 (see that notebook),
+# MAGIC scoped to `silver.ranking_individuals`/`ranking_pairs`. Skipped when
+# MAGIC `p_ranking_year`/`p_ranking_week` aren't supplied; on success/failure,
+# MAGIC updates the matching `control.batch_control` row.
 
 # COMMAND ----------
 
@@ -48,6 +41,12 @@ ALL_SILVER_TABLES = [
 ] + [
     f"{catalog_name}.{silver_schema}.{table_key}" for table_key in sorted(SILVER_REFERENCE_TABLES)
 ]
+
+dbutils.widgets.text("p_ranking_year", "")
+dbutils.widgets.text("p_ranking_week", "")
+v_ranking_year = dbutils.widgets.get("p_ranking_year")
+v_ranking_week = dbutils.widgets.get("p_ranking_week")
+HAVE_TARGET_WEEK = bool(v_ranking_year) and bool(v_ranking_week)
 
 # COMMAND ----------
 
@@ -127,16 +126,10 @@ for full_table_name, key_col in null_key_checks:
 # MAGIC `PAIR_KNOWN_GAP_THRESHOLD_PCT` back down to 5.0 once that extract pulls
 # MAGIC full pair history.
 # MAGIC
-# MAGIC **`ranking_pairs` note (MainRanking backfill exercise):** a hand-check
-# MAGIC against the actual `dbo_MainRanking.csv`/`dbo_Players_Doubles.csv`
-# MAGIC extracts, before this ran for real, found MainRanking's own pair rows
-# MAGIC resolve at ~99.97% against that `players_doubles` snapshot -- i.e. the
-# MAGIC historical backfill was NOT expected to push `ranking_pairs` anywhere
-# MAGIC near the `points_ledger` PAIR gap. `ranking_pairs` is deliberately kept
-# MAGIC at the standard 5% threshold below rather than pre-emptively copying
-# MAGIC `points_ledger`'s allowance -- if this run's real numbers disagree with
-# MAGIC that hand-check, that's worth knowing about via a real failure, not
-# MAGIC hiding behind a loosened threshold.
+# MAGIC **Step 11 note (per the Incremental_Load_Steps_7-11_Plan.docx review):**
+# MAGIC when comparing a parallel manual vs. orchestrated run, compare *absolute*
+# MAGIC unresolved counts for PAIR rows, not just this percentage gate -- a real
+# MAGIC regression could otherwise hide comfortably under this wide threshold.
 
 # COMMAND ----------
 
@@ -147,7 +140,7 @@ identity_resolution_checks = [
 ]
 
 UNRESOLVED_THRESHOLD_PCT = 5.0
-PAIR_KNOWN_GAP_THRESHOLD_PCT = 65.0  # explicit allowance for the documented bronze.players_doubles coverage gap in points_ledger only -- see README
+PAIR_KNOWN_GAP_THRESHOLD_PCT = 65.0  # explicit allowance for the documented bronze.players_doubles coverage gap (observed 59.4% + margin) -- see README
 
 for full_table_name in identity_resolution_checks:
     df = spark.table(full_table_name)
@@ -162,10 +155,6 @@ for full_table_name in identity_resolution_checks:
     else:
         print(f"OK    {full_table_name}: {unresolved}/{total} rows ({pct:.1f}%) unresolved")
 
-# points_ledger is checked separately, split by entity_type -- the known
-# pair-identity gap (see above) only affects PAIR rows, so INDIVIDUAL keeps
-# the standard threshold while PAIR gets the documented allowance instead of
-# being lumped into one table-wide percentage.
 points_ledger_table = f"{catalog_name}.{silver_schema}.points_ledger"
 points_ledger_df = spark.table(points_ledger_table)
 
@@ -184,11 +173,6 @@ for entity_type, threshold in [('INDIVIDUAL', UNRESOLVED_THRESHOLD_PCT), ('PAIR'
         note = " (known bronze.players_doubles coverage gap -- see README)" if entity_type == 'PAIR' else ""
         print(f"OK    {label}: {unresolved}/{total} rows ({pct:.1f}%) unresolved{note}")
 
-# A row whose subevent_code didn't map to either INDIVIDUAL or PAIR (see
-# INDIVIDUAL_SUBEVENTS/PAIR_SUBEVENTS in 04) has a null entity_type and is
-# silently excluded from the two loops above -- confirmed 0 such rows in
-# production today, so any appearing here is a new regression, not the known
-# pair-identity gap, and always fails regardless of count.
 unmapped_subevent_count = points_ledger_df.filter(F.col('entity_type').isNull()).count()
 if unmapped_subevent_count > 0:
     failures.append(
@@ -202,46 +186,55 @@ else:
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC #### Check 4 (new) - MainRanking merge data-quality signals
-# MAGIC Informational, not a hard failure (see header note): the
-# MAGIC `_dq_source_mismatch` count, and the distinct-week count on both tables
-# MAGIC so accumulation across the landing-CSV and MainRanking sources is
-# MAGIC visible at a glance.
+# MAGIC #### Check 4 - target-week-landed assertion (Step 8, freshness check)
+# MAGIC Same pattern as bronze's Check 4 -- see that notebook's comment.
 
 # COMMAND ----------
 
-for full_table_name in [
-    f"{catalog_name}.{silver_schema}.ranking_individuals",
-    f"{catalog_name}.{silver_schema}.ranking_pairs",
-]:
-    df = spark.table(full_table_name)
-    total = df.count()
-    mismatch_count = df.filter(F.col('_dq_source_mismatch') == True).count()  # noqa: E712
-    week_count = df.select('ranking_year', 'ranking_week').distinct().count()
-    source_breakdown = (
-        df.groupBy('_source_system').count().collect()
-        if '_source_system' in df.columns else []
-    )
-    print(
-        f"INFO  {full_table_name}: {total} rows, {week_count} distinct week(s), "
-        f"{mismatch_count} source-mismatch row(s), by source: "
-        f"{ {r['_source_system']: r['count'] for r in source_breakdown} }"
-    )
-    if mismatch_count > 0:
-        print(
-            f"      ^ {mismatch_count} row(s) had disagreeing rank/points between "
-            f"LANDING_CSV and MAIN_RANKING_HISTORICAL for the same week -- the "
-            f"LANDING_CSV value won, but this should be reviewed by hand, not ignored."
+if HAVE_TARGET_WEEK:
+    target_year, target_week = int(v_ranking_year), int(v_ranking_week)
+    for full_table_name in [
+        f"{catalog_name}.{silver_schema}.ranking_individuals",
+        f"{catalog_name}.{silver_schema}.ranking_pairs",
+    ]:
+        landed_count = (
+            spark.table(full_table_name)
+                .where((F.col('ranking_year') == target_year) & (F.col('ranking_week') == target_week))
+                .count()
         )
+        if landed_count == 0:
+            failures.append(
+                f"{full_table_name}: target week ({target_year}, {target_week}) has 0 rows -- "
+                f"this run did not actually land the week the orchestrator asked for"
+            )
+        else:
+            print(f"OK    {full_table_name}: target week ({target_year}, {target_week}) has {landed_count} row(s)")
+else:
+    print("INFO  p_ranking_year/p_ranking_week not supplied -- skipping Check 4 (standalone run).")
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC #### Result
+# MAGIC #### Result + `control.batch_control` status update
 
 # COMMAND ----------
 
 if failures:
+    if HAVE_TARGET_WEEK:
+        spark.sql(f"""
+            UPDATE wttrankingsbi.control.batch_control
+            SET status = 'failed', failed_at = current_timestamp(),
+                failure_stage = 'silver', failure_message = {chr(39)}{'; '.join(failures)[:4000].replace(chr(39), chr(39)+chr(39))}{chr(39)},
+                updated_at = current_timestamp()
+            WHERE ranking_year = {int(v_ranking_year)} AND ranking_week = {int(v_ranking_week)}
+        """)
     raise ValueError("Silver validation FAILED:\n" + "\n".join(f"  - {f}" for f in failures))
+
+if HAVE_TARGET_WEEK:
+    spark.sql(f"""
+        UPDATE wttrankingsbi.control.batch_control
+        SET status = 'silver_done', silver_done_at = current_timestamp(), updated_at = current_timestamp()
+        WHERE ranking_year = {int(v_ranking_year)} AND ranking_week = {int(v_ranking_week)}
+    """)
 
 print(f"Silver validation passed: {len(ALL_SILVER_TABLES)} tables checked.")

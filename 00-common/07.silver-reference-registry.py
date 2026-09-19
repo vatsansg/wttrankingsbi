@@ -11,14 +11,21 @@
 # MAGIC `ittfid` dimension, not a standalone table.
 # MAGIC
 # MAGIC `has_is_deleted`: whether the bronze table carries an `IsDeleted` flag
-# MAGIC worth filtering on for silver (only 2 of the 12 do -- most of these
+# MAGIC worth filtering on for silver (only 1 of the 12 do now -- most of these
 # MAGIC reference tables have no soft-delete column at all, so there's nothing
 # MAGIC to filter).
+# MAGIC
+# MAGIC **BUGFIX (2026-09-13):** `ref_countries` flipped from `True` to `False`.
+# MAGIC Its source table changed from `Countries_TTU` to `Countries` (DBA
+# MAGIC consolidation -- see `00-common/05.reference-table-registry`), and the
+# MAGIC new `Countries` table has no `IsDeleted` column at all. Leaving this on
+# MAGIC `True` would make `06.Silver Reference Table (Generic)` fail with a
+# MAGIC column-not-found error the moment it tries to filter on `is_deleted`.
 
 # COMMAND ----------
 
 SILVER_REFERENCE_TABLES = {
-    "ref_countries":                     {"has_is_deleted": True},
+    "ref_countries":                     {"has_is_deleted": False},
     "ref_continents":                    {"has_is_deleted": False},
     "ref_age_categories":                {"has_is_deleted": False},
     "ref_categories":                    {"has_is_deleted": False},

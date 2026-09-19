@@ -1,0 +1,4435 @@
+{
+  "datasets": [
+    {
+      "name": "571e2856",
+      "displayName": "ds_continental_pulse",
+      "queryLines": [
+        "Select * from wttrankingsbi.gold.v_continental_pulse WHERE (:ranking_category = 'All' OR ranking_run_code = :ranking_category) "
+      ],
+      "parameters": [
+        {
+          "displayName": "ranking_category",
+          "keyword": "ranking_category",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "All"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "catalog": "wttrankingsbi",
+      "schema": "default"
+    },
+    {
+      "name": "ab321715",
+      "displayName": "ds_continental_power_shift",
+      "queryLines": [
+        "select * from wttrankingsbi.gold.v_continental_power_shift WHERE (:ranking_category = 'All' OR ranking_run_code = :ranking_category) "
+      ],
+      "parameters": [
+        {
+          "displayName": "ranking_category",
+          "keyword": "ranking_category",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "All"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "catalog": "wttrankingsbi",
+      "schema": "default"
+    },
+    {
+      "name": "f64d6332",
+      "displayName": "ds_country_discipline_investment_trend",
+      "queryLines": [
+        "select * from wttrankingsbi.gold.v_country_discipline_investment_trend WHERE (:ranking_category = 'All' OR ranking_run_code = :ranking_category) "
+      ],
+      "parameters": [
+        {
+          "displayName": "ranking_category",
+          "keyword": "ranking_category",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "All"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8f270eef",
+      "displayName": "ds_discipline_landscape",
+      "queryLines": [
+        "select * from wttrankingsbi.gold.v_discipline_landscape WHERE (:ranking_category = 'All' OR ranking_run_code = :ranking_category) "
+      ],
+      "parameters": [
+        {
+          "displayName": "ranking_category",
+          "keyword": "ranking_category",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "All"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "67dc6db4",
+      "displayName": "ds_doubles_partnership_longevity",
+      "queryLines": [
+        "select * from wttrankingsbi.gold.v_doubles_partnership_longevity"
+      ]
+    },
+    {
+      "name": "2ea3151e",
+      "displayName": "ds_doubles_partnerships",
+      "queryLines": [
+        "select * from wttrankingsbi.gold.v_doubles_partnerships WHERE (:ranking_category = 'All' OR ranking_run_code = :ranking_category) "
+      ],
+      "parameters": [
+        {
+          "displayName": "ranking_category",
+          "keyword": "ranking_category",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "All"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3bd05292",
+      "displayName": "ds_federation_scorecard",
+      "queryLines": [
+        "select * from wttrankingsbi.gold.v_federation_scorecard WHERE (:ranking_category = 'All' OR ranking_run_code = :ranking_category) "
+      ],
+      "parameters": [
+        {
+          "displayName": "ranking_category",
+          "keyword": "ranking_category",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "All"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "9de7ebfc",
+      "displayName": "ds_federation_strength_trajectory",
+      "queryLines": [
+        "select * from wttrankingsbi.gold.v_federation_strength_trajectory WHERE (:ranking_category = 'All' OR ranking_run_code = :ranking_category) "
+      ],
+      "parameters": [
+        {
+          "displayName": "ranking_category",
+          "keyword": "ranking_category",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "All"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "bbc834d1",
+      "displayName": "ds_fresh_faces",
+      "queryLines": [
+        "select * from wttrankingsbi.gold.v_fresh_faces WHERE (:ranking_category = 'All' OR ranking_run_code = :ranking_category) "
+      ],
+      "parameters": [
+        {
+          "displayName": "ranking_category",
+          "keyword": "ranking_category",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "All"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "83e5028e",
+      "displayName": "ds_junior_to_senior_transition",
+      "queryLines": [
+        "Select * from wttrankingsbi.gold.v_junior_to_senior_transition WHERE (:ranking_category = 'All' OR ranking_run_code = :ranking_category) "
+      ],
+      "parameters": [
+        {
+          "displayName": "ranking_category",
+          "keyword": "ranking_category",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "All"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8874301c",
+      "displayName": "ds_new_entrant_retention_curve",
+      "queryLines": [
+        "Select * from wttrankingsbi.gold.v_new_entrant_retention_curve"
+      ]
+    },
+    {
+      "name": "162df075",
+      "displayName": "ds_peak_rank_career_longevity",
+      "queryLines": [
+        "Select * from wttrankingsbi.gold.v_peak_rank_career_longevity WHERE (:ranking_category = 'All' OR ranking_run_code = :ranking_category) "
+      ],
+      "parameters": [
+        {
+          "displayName": "ranking_category",
+          "keyword": "ranking_category",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "All"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6e660246",
+      "displayName": "ds_ranking_leaders",
+      "queryLines": [
+        "Select * from wttrankingsbi.gold.v_ranking_leaders WHERE (:ranking_category = 'All' OR ranking_run_code = :ranking_category) "
+      ],
+      "parameters": [
+        {
+          "displayName": "ranking_category",
+          "keyword": "ranking_category",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "All"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3462fbd6",
+      "displayName": "ds_ranking_movers",
+      "queryLines": [
+        "Select * from wttrankingsbi.gold.v_ranking_movers WHERE (:ranking_category = 'All' OR ranking_run_code = :ranking_category) "
+      ],
+      "parameters": [
+        {
+          "displayName": "ranking_category",
+          "keyword": "ranking_category",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "All"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "c173fc06",
+      "displayName": "ds_volatility_consistency_index",
+      "queryLines": [
+        "Select * from wttrankingsbi.gold.v_volatility_consistency_index WHERE (:ranking_category = 'All' OR ranking_run_code = :ranking_category) "
+      ],
+      "parameters": [
+        {
+          "displayName": "ranking_category",
+          "keyword": "ranking_category",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "All"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "50f9dca4",
+      "displayName": "ds_youth_pipeline",
+      "queryLines": [
+        "Select * from wttrankingsbi.gold.v_youth_pipeline"
+      ]
+    },
+    {
+      "name": "bbc4ddad",
+      "displayName": "ds_player_career_trajectory",
+      "queryLines": [
+        "Select * from wttrankingsbi.gold.v_player_career_trajectory WHERE (:ranking_category = 'All' OR ranking_run_code = :ranking_category) "
+      ],
+      "parameters": [
+        {
+          "displayName": "ranking_category",
+          "keyword": "ranking_category",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "All"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6e268573",
+      "displayName": "Total Ranked Athletes",
+      "queryLines": [
+        "SELECT COUNT(DISTINCT ittfid) AS total_individuals FROM wttrankingsbi.gold.fact_ranking_individual"
+      ]
+    },
+    {
+      "name": "8fd6495e",
+      "displayName": "Unique Countries Count in Ranking Data",
+      "queryLines": [
+        "SELECT COUNT(DISTINCT country_code) AS countries FROM wttrankingsbi.gold.fact_ranking_individual WHERE country_code IS NOT NULL"
+      ]
+    },
+    {
+      "name": "6f57c55d",
+      "displayName": "Years of History Tracked",
+      "queryLines": [
+        "SELECT (MAX(ranking_year) - MIN(ranking_year) + 1) AS years_tracked FROM wttrankingsbi.gold.fact_ranking_individual"
+      ]
+    },
+    {
+      "name": "3c9f20a7",
+      "displayName": "New Entrants This Week",
+      "queryLines": [
+        "SELECT SUM(new_entrant_count) AS new_entrants FROM wttrankingsbi.gold.v_fresh_faces"
+      ]
+    },
+    {
+      "name": "cd587df8",
+      "displayName": "% of Senior File Still Junior-Aged",
+      "queryLines": [
+        "SELECT ROUND(SUM(v.junior_in_senior_file_count) / (SELECT COUNT(DISTINCT ittfid) FROM wttrankingsbi.gold.fact_ranking_individual WHERE ranking_run_code = 'SEN') * 100, 1) AS pct_junior FROM wttrankingsbi.gold.v_youth_pipeline v"
+      ]
+    },
+    {
+      "name": "3c6ecd64",
+      "displayName": "Top Federation by Depth",
+      "queryLines": [
+        "WITH ranked AS (\r\n",
+        "  SELECT\r\n",
+        "    subevent_code,\r\n",
+        "    country_code,\r\n",
+        "    country_name,\r\n",
+        "    ranked_player_count,\r\n",
+        "    ROW_NUMBER() OVER (PARTITION BY subevent_code ORDER BY ranked_player_count DESC) AS rn\r\n",
+        "  FROM wttrankingsbi.gold.v_federation_scorecard\r\n",
+        "  WHERE ranking_run_code = 'SEN'\r\n",
+        ")\r\n",
+        "SELECT subevent_code, rn AS rank, country_code, country_name, ranked_player_count\r\n",
+        "FROM ranked\r\n",
+        "WHERE rn <= 3\r\n",
+        "ORDER BY\r\n",
+        "  CASE subevent_code\r\n",
+        "    WHEN 'MS'  THEN 1\r\n",
+        "    WHEN 'WS'  THEN 2\r\n",
+        "    WHEN 'MD'  THEN 3\r\n",
+        "    WHEN 'MDI' THEN 4\r\n",
+        "    WHEN 'WD'  THEN 5\r\n",
+        "    WHEN 'WDI' THEN 6\r\n",
+        "    WHEN 'XD'  THEN 7\r\n",
+        "    WHEN 'XDI' THEN 8\r\n",
+        "    ELSE 99\r\n",
+        "  END,\r\n",
+        "  rn;"
+      ]
+    },
+    {
+      "name": "world_number_ones",
+      "displayName": "World #1 by Subevent",
+      "queryLines": [
+        "SELECT\n",
+        "  subevent_code,\n",
+        "  player_name,\n",
+        "  country_code,\n",
+        "  CAST(ranking_points_ytd AS INT) AS ranking_points_ytd\n",
+        "FROM\n",
+        "  wttrankingsbi.gold.v_ranking_leaders\n",
+        "WHERE\n",
+        "  leaderboard_position = 1\n",
+        "  AND ranking_run_code = 'SEN'\n",
+        "ORDER BY\n",
+        "  CASE subevent_code\n",
+        "    WHEN 'MS' THEN 1\n",
+        "    WHEN 'WS' THEN 2\n",
+        "    WHEN 'MD' THEN 3\n",
+        "    WHEN 'MDI' THEN 4\n",
+        "    WHEN 'WD' THEN 5\n",
+        "    WHEN 'WDI' THEN 6\n",
+        "    WHEN 'XD' THEN 7\n",
+        "    WHEN 'XDI' THEN 8\n",
+        "    ELSE 99\n",
+        "  END"
+      ]
+    },
+    {
+      "name": "top_risers",
+      "displayName": "Top 10 Biggest Risers",
+      "queryLines": [
+        "SELECT\n",
+        "  player_name,\n",
+        "  country_code,\n",
+        "  subevent_code,\n",
+        "  previous_rank,\n",
+        "  current_rank,\n",
+        "  ranking_difference\n",
+        "FROM\n",
+        "  wttrankingsbi.gold.v_ranking_movers\n",
+        "WHERE\n",
+        "  ranking_run_code = 'SEN'\n",
+        "  AND ranking_difference > 0\n",
+        "ORDER BY\n",
+        "  ranking_difference DESC\n",
+        "LIMIT 10"
+      ]
+    },
+    {
+      "name": "top_avg_points",
+      "displayName": "Top Federations by Avg Points",
+      "queryLines": [
+        "SELECT\n",
+        "  country_name,\n",
+        "  CAST(ROUND(AVG(avg_ranking_points), 0) AS INT) AS avg_pts\n",
+        "FROM\n",
+        "  wttrankingsbi.gold.v_federation_scorecard\n",
+        "WHERE\n",
+        "  ranking_run_code = 'SEN'\n",
+        "GROUP BY\n",
+        "  country_name\n",
+        "ORDER BY\n",
+        "  avg_pts DESC\n",
+        "LIMIT 8"
+      ]
+    },
+    {
+      "name": "38783696",
+      "displayName": "ds_fact_ranking_individual",
+      "queryLines": [
+        "SELECT * from wttrankingsbi.gold.fact_ranking_individual"
+      ]
+    },
+    {
+      "name": "03ae5f43",
+      "displayName": "ds_fact_ranking_pair",
+      "queryLines": [
+        "Select * from wttrankingsbi.gold.fact_ranking_pair"
+      ]
+    },
+    {
+      "name": "143052af",
+      "displayName": "ds_dim_age_category",
+      "queryLines": [
+        "Select * from wttrankingsbi.gold.dim_age_category"
+      ]
+    },
+    {
+      "name": "10ccba30",
+      "displayName": "Gold Tier Player Performance Records",
+      "queryLines": [
+        "SELECT * from wttrankingsbi.gold.dim_player"
+      ]
+    },
+    {
+      "name": "873a69fd",
+      "displayName": "Player Performance Metrics Dataset Summary",
+      "queryLines": [
+        "Select * from wttrankingsbi.gold.dim_player"
+      ]
+    },
+    {
+      "name": "5e0375f1",
+      "displayName": "ds_dim_pair",
+      "queryLines": [
+        "SELECT * from wttrankingsbi.gold.dim_pair"
+      ]
+    },
+    {
+      "name": "c1969e3d",
+      "displayName": "ds_dim_ranking_week",
+      "queryLines": [
+        "SELECT * from wttrankingsbi.gold.dim_ranking_week"
+      ]
+    },
+    {
+      "name": "c79d6b31",
+      "displayName": "ds_dim_subevent",
+      "queryLines": [
+        "SELECT * from wttrankingsbi.gold.dim_subevent"
+      ]
+    },
+    {
+      "name": "trend_doubles_ind",
+      "displayName": "Trend — Doubles Individual",
+      "queryLines": [
+        "WITH params AS (\n",
+        "  SELECT\n",
+        "    COALESCE(REGEXP_EXTRACT(:p_ittfid, '\\\\(([0-9]+)\\\\)', 1), '121558') AS pid\n",
+        "),\n",
+        "gc AS (\n",
+        "  SELECT\n",
+        "    CASE\n",
+        "      WHEN UPPER(gender) LIKE 'M%' THEN 'MDI'\n",
+        "      ELSE 'WDI'\n",
+        "    END AS code\n",
+        "  FROM\n",
+        "    wttrankingsbi.gold.dim_player dp\n",
+        "      JOIN params p\n",
+        "        ON dp.ittfid = p.pid\n",
+        "),\n",
+        "li AS (\n",
+        "  SELECT\n",
+        "    MAX(ranking_year * 100 + ranking_week) AS mk\n",
+        "  FROM\n",
+        "    wttrankingsbi.gold.fact_ranking_individual\n",
+        "  WHERE\n",
+        "    ranking_run_code = 'SEN'\n",
+        ")\n",
+        "SELECT\n",
+        "  f.ranking_year,\n",
+        "  f.ranking_week,\n",
+        "  CONCAT(\n",
+        "    CAST(f.ranking_year AS STRING),\n",
+        "    ' W',\n",
+        "    LPAD(CAST(f.ranking_week AS STRING), 2, '0')\n",
+        "  ) AS period_label,\n",
+        "  f.ranking_year * 100 + f.ranking_week AS period_key,\n",
+        "  f.current_rank,\n",
+        "  f.ranking_points_ytd AS ranking_points,\n",
+        "  (f.ranking_year * 100 + f.ranking_week) = l.mk AS is_current_week,\n",
+        "  ((f.ranking_year * 100 + f.ranking_week) = MAX(f.ranking_year * 100 + f.ranking_week) OVER ()) AND ((f.ranking_year * 100 + f.ranking_week) != l.mk) AS is_last_ranked,\n",
+        "  CASE\n",
+        "    WHEN (f.ranking_year * 100 + f.ranking_week) = l.mk THEN\n",
+        "      CONCAT('Current — Rank #', CAST(f.current_rank AS STRING), ' | ', CAST(f.ranking_year AS STRING), ' W', LPAD(CAST(f.ranking_week AS STRING), 2, '0'))\n",
+        "    WHEN ((f.ranking_year * 100 + f.ranking_week) = MAX(f.ranking_year * 100 + f.ranking_week) OVER ()) AND ((f.ranking_year * 100 + f.ranking_week) != l.mk) THEN\n",
+        "      CONCAT('Last Ranked — Rank #', CAST(f.current_rank AS STRING), ' | ', CAST(f.ranking_year AS STRING), ' W', LPAD(CAST(f.ranking_week AS STRING), 2, '0'))\n",
+        "  END AS current_annotation\n",
+        "FROM\n",
+        "  wttrankingsbi.gold.fact_ranking_individual f\n",
+        "    JOIN params p\n",
+        "      ON f.ittfid = p.pid\n",
+        "    JOIN gc g\n",
+        "      ON f.subevent_code = g.code\n",
+        "    CROSS JOIN li l\n",
+        "WHERE\n",
+        "  f.ranking_run_code = 'SEN'\n",
+        "  AND f.current_rank IS NOT NULL\n",
+        "ORDER BY\n",
+        "  f.ranking_year,\n",
+        "  f.ranking_week"
+      ],
+      "parameters": [
+        {
+          "displayName": "Player",
+          "keyword": "p_ittfid",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "WANG Chuqin (121558)"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "player_facts",
+      "displayName": "Player Facts",
+      "queryLines": [
+        "WITH params AS (\n",
+        "  SELECT\n",
+        "    COALESCE(REGEXP_EXTRACT(:p_ittfid, '\\\\(([0-9]+)\\\\)', 1), '121558') AS pid\n",
+        "),\n",
+        "player AS (\n",
+        "  SELECT\n",
+        "    dp.ittfid,\n",
+        "    dp.player_name,\n",
+        "    CASE\n",
+        "      WHEN UPPER(dp.gender) LIKE 'M%' THEN CONCAT('Men', chr(39), 's')\n",
+        "      ELSE CONCAT('Women', chr(39), 's')\n",
+        "    END AS glabel,\n",
+        "    CASE\n",
+        "      WHEN UPPER(dp.gender) LIKE 'M%' THEN 'MS'\n",
+        "      ELSE 'WS'\n",
+        "    END AS s_code,\n",
+        "    CASE\n",
+        "      WHEN UPPER(dp.gender) LIKE 'M%' THEN 'MD'\n",
+        "      ELSE 'WD'\n",
+        "    END AS d_code,\n",
+        "    CASE\n",
+        "      WHEN UPPER(dp.gender) LIKE 'M%' THEN 'MDI'\n",
+        "      ELSE 'WDI'\n",
+        "    END AS di_code\n",
+        "  FROM\n",
+        "    wttrankingsbi.gold.dim_player dp\n",
+        "  WHERE\n",
+        "    dp.ittfid\n",
+        "      = (\n",
+        "        SELECT\n",
+        "          pid\n",
+        "        FROM\n",
+        "          params\n",
+        "      )\n",
+        "),\n",
+        "li AS (\n",
+        "  SELECT\n",
+        "    MAX(ranking_year * 100 + ranking_week) AS mk,\n",
+        "    CAST(MAX(ranking_year * 100 + ranking_week) / 100 AS INT) AS ly,\n",
+        "    CAST(MAX(ranking_year * 100 + ranking_week) % 100 AS INT) AS lw\n",
+        "  FROM\n",
+        "    wttrankingsbi.gold.fact_ranking_individual\n",
+        "  WHERE\n",
+        "    ranking_run_code = 'SEN'\n",
+        "),\n",
+        "ind_all AS (\n",
+        "  SELECT\n",
+        "    f.subevent_code,\n",
+        "    f.current_rank,\n",
+        "    f.ranking_year,\n",
+        "    f.ranking_week,\n",
+        "    f.ranking_year * 100 + f.ranking_week AS pk\n",
+        "  FROM\n",
+        "    wttrankingsbi.gold.fact_ranking_individual f\n",
+        "  WHERE\n",
+        "    f.ittfid\n",
+        "      = (\n",
+        "        SELECT\n",
+        "          pid\n",
+        "        FROM\n",
+        "          params\n",
+        "      )\n",
+        "    AND f.ranking_run_code = 'SEN'\n",
+        "    AND f.current_rank IS NOT NULL\n",
+        "),\n",
+        "ind_curr AS (\n",
+        "  SELECT\n",
+        "    subevent_code,\n",
+        "    current_rank AS cr\n",
+        "  FROM\n",
+        "    ind_all\n",
+        "  WHERE\n",
+        "    pk\n",
+        "      = (\n",
+        "        SELECT\n",
+        "          mk\n",
+        "        FROM\n",
+        "          li\n",
+        "      )\n",
+        "),\n",
+        "ind_best AS (\n",
+        "  SELECT\n",
+        "    subevent_code,\n",
+        "    cr,\n",
+        "    ry,\n",
+        "    rw\n",
+        "  FROM\n",
+        "    (\n",
+        "      SELECT\n",
+        "        subevent_code,\n",
+        "        current_rank AS cr,\n",
+        "        ranking_year AS ry,\n",
+        "        ranking_week AS rw,\n",
+        "        ROW_NUMBER() OVER (\n",
+        "            PARTITION BY subevent_code\n",
+        "            ORDER BY current_rank, ranking_year, ranking_week\n",
+        "          ) AS rn\n",
+        "      FROM\n",
+        "        ind_all\n",
+        "    ) t\n",
+        "  WHERE\n",
+        "    rn = 1\n",
+        "),\n",
+        "my_pairs AS (\n",
+        "  SELECT\n",
+        "    dpr.ittfid AS pair_id,\n",
+        "    dpr.subevent_code\n",
+        "  FROM\n",
+        "    wttrankingsbi.gold.dim_pair dpr\n",
+        "  WHERE\n",
+        "    dpr.partner1_ittfid\n",
+        "      = (\n",
+        "        SELECT\n",
+        "          pid\n",
+        "        FROM\n",
+        "          params\n",
+        "      )\n",
+        "    OR dpr.partner2_ittfid\n",
+        "      = (\n",
+        "        SELECT\n",
+        "          pid\n",
+        "        FROM\n",
+        "          params\n",
+        "      )\n",
+        "),\n",
+        "lp AS (\n",
+        "  SELECT\n",
+        "    MAX(ranking_year * 100 + ranking_week) AS mk\n",
+        "  FROM\n",
+        "    wttrankingsbi.gold.fact_ranking_pair\n",
+        "  WHERE\n",
+        "    ranking_run_code = 'SEN'\n",
+        "),\n",
+        "pair_curr AS (\n",
+        "  SELECT\n",
+        "    mp.subevent_code,\n",
+        "    MIN(f.current_rank) AS cr\n",
+        "  FROM\n",
+        "    wttrankingsbi.gold.fact_ranking_pair f\n",
+        "      JOIN my_pairs mp\n",
+        "        ON f.ittfid = mp.pair_id\n",
+        "  WHERE\n",
+        "    f.ranking_run_code = 'SEN'\n",
+        "    AND f.ranking_year * 100 + f.ranking_week\n",
+        "      = (\n",
+        "        SELECT\n",
+        "          mk\n",
+        "        FROM\n",
+        "          lp\n",
+        "      )\n",
+        "  GROUP BY\n",
+        "    mp.subevent_code\n",
+        "),\n",
+        "pair_best AS (\n",
+        "  SELECT\n",
+        "    subevent_code,\n",
+        "    cr,\n",
+        "    ry,\n",
+        "    rw\n",
+        "  FROM\n",
+        "    (\n",
+        "      SELECT\n",
+        "        mp.subevent_code,\n",
+        "        f.current_rank AS cr,\n",
+        "        f.ranking_year AS ry,\n",
+        "        f.ranking_week AS rw,\n",
+        "        ROW_NUMBER() OVER (\n",
+        "            PARTITION BY mp.subevent_code\n",
+        "            ORDER BY f.current_rank, f.ranking_year, f.ranking_week\n",
+        "          ) AS rn\n",
+        "      FROM\n",
+        "        wttrankingsbi.gold.fact_ranking_pair f\n",
+        "          JOIN my_pairs mp\n",
+        "            ON f.ittfid = mp.pair_id\n",
+        "      WHERE\n",
+        "        f.ranking_run_code = 'SEN'\n",
+        "        AND f.current_rank IS NOT NULL\n",
+        "    ) t\n",
+        "  WHERE\n",
+        "    rn = 1\n",
+        ")\n",
+        "SELECT\n",
+        "  p.pid AS ittfid,\n",
+        "  pl.player_name,\n",
+        "  pl.glabel AS gender_label,\n",
+        "  l.ly AS latest_year,\n",
+        "  l.lw AS latest_week,\n",
+        "  CONCAT(\n",
+        "    'Player ',\n",
+        "    pl.player_name,\n",
+        "    ' (ITTF ID ',\n",
+        "    p.pid,\n",
+        "    ') Performance as of ',\n",
+        "    CAST(l.ly AS STRING),\n",
+        "    ' Week ',\n",
+        "    LPAD(CAST(l.lw AS STRING), 2, '0')\n",
+        "  ) AS page_title,\n",
+        "  CONCAT(\n",
+        "    'ITTF ID ',\n",
+        "    p.pid,\n",
+        "    ' | Week ',\n",
+        "    LPAD(CAST(l.lw AS STRING), 2, '0'),\n",
+        "    ', ',\n",
+        "    CAST(l.ly AS STRING)\n",
+        "  ) AS subtitle,\n",
+        "  CONCAT(\n",
+        "    '<div style=\"font-family:Inter,sans-serif\"><div style=\"font-size:20px;font-weight:800;color:#0B1F2A;margin-bottom:4px\">',\n",
+        "    pl.player_name,\n",
+        "    '</div><div style=\"font-size:11px;color:#64748B;margin-bottom:8px\">ITTF ID ',\n",
+        "    p.pid,\n",
+        "    ' | Week ',\n",
+        "    LPAD(CAST(l.lw AS STRING), 2, '0'),\n",
+        "    ', ',\n",
+        "    CAST(l.ly AS STRING),\n",
+        "    '</div><div style=\"border-top:3px solid #C1121F;width:36px;padding-top:8px\"><a href=\"https://www.worldtabletennis.com/playerDescription?playerId=',\n",
+        "    p.pid,\n",
+        "    '\" target=\"_blank\" style=\"color:#C1121F;font-weight:600;font-size:13px;text-decoration:none\">View Player Profile</a></div></div>'\n",
+        "  ) AS header_html,\n",
+        "  CONCAT('https://www.worldtabletennis.com/playerDescription?playerId=', p.pid) AS profile_url,\n",
+        "  CONCAT(\n",
+        "    'https://photofiles.worldtabletennis.com/wtt-media/photos/400px/',\n",
+        "    p.pid,\n",
+        "    '_HEADSHOT_R_',\n",
+        "    REPLACE(pl.player_name, ' ', '_'),\n",
+        "    '.png'\n",
+        "  ) AS image_url,\n",
+        "  CONCAT(\n",
+        "    '<div style=\"width:100%;height:220px;background-image:url(',\n",
+        "    chr(39),\n",
+        "    'https://photofiles.worldtabletennis.com/wtt-media/photos/400px/',\n",
+        "    p.pid,\n",
+        "    '_Headshot_R_',\n",
+        "    REPLACE(pl.player_name, ' ', '_'),\n",
+        "    '.png',\n",
+        "    chr(39),\n",
+        "    '),url(',\n",
+        "    chr(39),\n",
+        "    'https://photofiles.worldtabletennis.com/wtt-media/photos/400px/',\n",
+        "    p.pid,\n",
+        "    '_HEADSHOT_R_',\n",
+        "    REPLACE(pl.player_name, ' ', '_'),\n",
+        "    '.png',\n",
+        "    chr(39),\n",
+        "    ');background-size:contain;background-repeat:no-repeat;background-position:center\"></div>'\n",
+        "  ) AS image_html,\n",
+        "  'View Player Profile' AS profile_link_text,\n",
+        "  CONCAT(\n",
+        "    '<a href=\"https://www.worldtabletennis.com/playerDescription?playerId=',\n",
+        "    p.pid,\n",
+        "    '\" target=\"_blank\" style=\"color:#C1121F;font-size:15px;font-weight:700;text-decoration:none;font-family:Inter,sans-serif\">',\n",
+        "    pl.player_name,\n",
+        "    '</a>'\n",
+        "  ) AS profile_link_html,\n",
+        "  CONCAT(pl.glabel, ' Singles Ranking') AS singles_label,\n",
+        "  COALESCE(CONCAT('#', CAST(s_curr.cr AS STRING)), 'NONE') AS singles_current_rank,\n",
+        "  COALESCE(\n",
+        "    CONCAT('Week ', LPAD(CAST(l.lw AS STRING), 2, '0'), ', ', CAST(l.ly AS STRING)),\n",
+        "    ''\n",
+        "  ) AS singles_current_period,\n",
+        "  COALESCE(CONCAT('#', CAST(s_best.cr AS STRING)), 'NONE') AS singles_best_rank,\n",
+        "  COALESCE(\n",
+        "    CONCAT('Week ', LPAD(CAST(s_best.rw AS STRING), 2, '0'), ', ', CAST(s_best.ry AS STRING)),\n",
+        "    ''\n",
+        "  ) AS singles_best_period,\n",
+        "  CONCAT(pl.glabel, ' Doubles Ranking') AS doubles_label,\n",
+        "  COALESCE(CONCAT('#', CAST(d_curr.cr AS STRING)), 'NONE') AS doubles_current_rank,\n",
+        "  COALESCE(\n",
+        "    CONCAT('Week ', LPAD(CAST(l.lw AS STRING), 2, '0'), ', ', CAST(l.ly AS STRING)),\n",
+        "    ''\n",
+        "  ) AS doubles_current_period,\n",
+        "  COALESCE(CONCAT('#', CAST(d_best.cr AS STRING)), 'NONE') AS doubles_best_rank,\n",
+        "  COALESCE(\n",
+        "    CONCAT('Week ', LPAD(CAST(d_best.rw AS STRING), 2, '0'), ', ', CAST(d_best.ry AS STRING)),\n",
+        "    ''\n",
+        "  ) AS doubles_best_period,\n",
+        "  CONCAT(pl.glabel, ' Doubles Individual Ranking') AS doublesind_label,\n",
+        "  COALESCE(CONCAT('#', CAST(di_curr.cr AS STRING)), 'NONE') AS doublesind_current_rank,\n",
+        "  COALESCE(\n",
+        "    CONCAT('Week ', LPAD(CAST(l.lw AS STRING), 2, '0'), ', ', CAST(l.ly AS STRING)),\n",
+        "    ''\n",
+        "  ) AS doublesind_current_period,\n",
+        "  COALESCE(CONCAT('#', CAST(di_best.cr AS STRING)), 'NONE') AS doublesind_best_rank,\n",
+        "  COALESCE(\n",
+        "    CONCAT('Week ', LPAD(CAST(di_best.rw AS STRING), 2, '0'), ', ', CAST(di_best.ry AS STRING)),\n",
+        "    ''\n",
+        "  ) AS doublesind_best_period,\n",
+        "  'Mixed Doubles Ranking' AS xd_label,\n",
+        "  COALESCE(CONCAT('#', CAST(xd_curr.cr AS STRING)), 'NONE') AS xd_current_rank,\n",
+        "  COALESCE(\n",
+        "    CONCAT('Week ', LPAD(CAST(l.lw AS STRING), 2, '0'), ', ', CAST(l.ly AS STRING)),\n",
+        "    ''\n",
+        "  ) AS xd_current_period,\n",
+        "  COALESCE(CONCAT('#', CAST(xd_best.cr AS STRING)), 'NONE') AS xd_best_rank,\n",
+        "  COALESCE(\n",
+        "    CONCAT('Week ', LPAD(CAST(xd_best.rw AS STRING), 2, '0'), ', ', CAST(xd_best.ry AS STRING)),\n",
+        "    ''\n",
+        "  ) AS xd_best_period,\n",
+        "  'Mixed Doubles Individual Ranking' AS xdi_label,\n",
+        "  COALESCE(CONCAT('#', CAST(xdi_curr.cr AS STRING)), 'NONE') AS xdi_current_rank,\n",
+        "  COALESCE(\n",
+        "    CONCAT('Week ', LPAD(CAST(l.lw AS STRING), 2, '0'), ', ', CAST(l.ly AS STRING)),\n",
+        "    ''\n",
+        "  ) AS xdi_current_period,\n",
+        "  COALESCE(CONCAT('#', CAST(xdi_best.cr AS STRING)), 'NONE') AS xdi_best_rank,\n",
+        "  COALESCE(\n",
+        "    CONCAT('Week ', LPAD(CAST(xdi_best.rw AS STRING), 2, '0'), ', ', CAST(xdi_best.ry AS STRING)),\n",
+        "    ''\n",
+        "  ) AS xdi_best_period\n",
+        "FROM\n",
+        "  params p\n",
+        "    LEFT JOIN player pl\n",
+        "      ON TRUE\n",
+        "    LEFT JOIN li l\n",
+        "      ON TRUE\n",
+        "    LEFT JOIN ind_curr s_curr\n",
+        "      ON s_curr.subevent_code = pl.s_code\n",
+        "    LEFT JOIN ind_best s_best\n",
+        "      ON s_best.subevent_code = pl.s_code\n",
+        "    LEFT JOIN pair_curr d_curr\n",
+        "      ON d_curr.subevent_code = pl.d_code\n",
+        "    LEFT JOIN pair_best d_best\n",
+        "      ON d_best.subevent_code = pl.d_code\n",
+        "    LEFT JOIN ind_curr di_curr\n",
+        "      ON di_curr.subevent_code = pl.di_code\n",
+        "    LEFT JOIN ind_best di_best\n",
+        "      ON di_best.subevent_code = pl.di_code\n",
+        "    LEFT JOIN pair_curr xd_curr\n",
+        "      ON xd_curr.subevent_code = 'XD'\n",
+        "    LEFT JOIN pair_best xd_best\n",
+        "      ON xd_best.subevent_code = 'XD'\n",
+        "    LEFT JOIN ind_curr xdi_curr\n",
+        "      ON xdi_curr.subevent_code = 'XDI'\n",
+        "    LEFT JOIN ind_best xdi_best\n",
+        "      ON xdi_best.subevent_code = 'XDI'"
+      ],
+      "parameters": [
+        {
+          "displayName": "Player",
+          "keyword": "p_ittfid",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "WANG Chuqin (121558)"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "trend_xdi",
+      "displayName": "Trend — Mixed Doubles Individual",
+      "queryLines": [
+        "WITH params AS (\n",
+        "  SELECT\n",
+        "    COALESCE(REGEXP_EXTRACT(:p_ittfid, '\\\\(([0-9]+)\\\\)', 1), '121558') AS pid\n",
+        "),\n",
+        "li AS (\n",
+        "  SELECT\n",
+        "    MAX(ranking_year * 100 + ranking_week) AS mk\n",
+        "  FROM\n",
+        "    wttrankingsbi.gold.fact_ranking_individual\n",
+        "  WHERE\n",
+        "    ranking_run_code = 'SEN'\n",
+        ")\n",
+        "SELECT\n",
+        "  f.ranking_year,\n",
+        "  f.ranking_week,\n",
+        "  CONCAT(\n",
+        "    CAST(f.ranking_year AS STRING),\n",
+        "    ' W',\n",
+        "    LPAD(CAST(f.ranking_week AS STRING), 2, '0')\n",
+        "  ) AS period_label,\n",
+        "  f.ranking_year * 100 + f.ranking_week AS period_key,\n",
+        "  f.current_rank,\n",
+        "  f.ranking_points_ytd AS ranking_points,\n",
+        "  (f.ranking_year * 100 + f.ranking_week) = l.mk AS is_current_week,\n",
+        "  ((f.ranking_year * 100 + f.ranking_week) = MAX(f.ranking_year * 100 + f.ranking_week) OVER ()) AND ((f.ranking_year * 100 + f.ranking_week) != l.mk) AS is_last_ranked,\n",
+        "  CASE\n",
+        "    WHEN (f.ranking_year * 100 + f.ranking_week) = l.mk THEN\n",
+        "      CONCAT('Current — Rank #', CAST(f.current_rank AS STRING), ' | ', CAST(f.ranking_year AS STRING), ' W', LPAD(CAST(f.ranking_week AS STRING), 2, '0'))\n",
+        "    WHEN ((f.ranking_year * 100 + f.ranking_week) = MAX(f.ranking_year * 100 + f.ranking_week) OVER ()) AND ((f.ranking_year * 100 + f.ranking_week) != l.mk) THEN\n",
+        "      CONCAT('Last Ranked — Rank #', CAST(f.current_rank AS STRING), ' | ', CAST(f.ranking_year AS STRING), ' W', LPAD(CAST(f.ranking_week AS STRING), 2, '0'))\n",
+        "  END AS current_annotation\n",
+        "FROM\n",
+        "  wttrankingsbi.gold.fact_ranking_individual f\n",
+        "    JOIN params p\n",
+        "      ON f.ittfid = p.pid\n",
+        "    CROSS JOIN li l\n",
+        "WHERE\n",
+        "  f.ranking_run_code = 'SEN'\n",
+        "  AND f.subevent_code = 'XDI'\n",
+        "  AND f.current_rank IS NOT NULL\n",
+        "ORDER BY\n",
+        "  f.ranking_year,\n",
+        "  f.ranking_week"
+      ],
+      "parameters": [
+        {
+          "displayName": "Player",
+          "keyword": "p_ittfid",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "WANG Chuqin (121558)"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "trend_doubles",
+      "displayName": "Trend — Doubles",
+      "queryLines": [
+        "WITH params AS (\n",
+        "  SELECT\n",
+        "    COALESCE(REGEXP_EXTRACT(:p_ittfid, '\\\\(([0-9]+)\\\\)', 1), '121558') AS pid\n",
+        "),\n",
+        "gc AS (\n",
+        "  SELECT\n",
+        "    CASE\n",
+        "      WHEN UPPER(gender) LIKE 'M%' THEN 'MD'\n",
+        "      ELSE 'WD'\n",
+        "    END AS code\n",
+        "  FROM\n",
+        "    wttrankingsbi.gold.dim_player dp\n",
+        "      JOIN params p\n",
+        "        ON dp.ittfid = p.pid\n",
+        "),\n",
+        "my_pairs AS (\n",
+        "  SELECT\n",
+        "    dpr.ittfid AS pair_id\n",
+        "  FROM\n",
+        "    wttrankingsbi.gold.dim_pair dpr\n",
+        "      JOIN params p\n",
+        "        ON (\n",
+        "          dpr.partner1_ittfid = p.pid\n",
+        "          OR dpr.partner2_ittfid = p.pid\n",
+        "        )\n",
+        "      JOIN gc g\n",
+        "        ON dpr.subevent_code = g.code\n",
+        "),\n",
+        "lp AS (\n",
+        "  SELECT\n",
+        "    MAX(ranking_year * 100 + ranking_week) AS mk\n",
+        "  FROM\n",
+        "    wttrankingsbi.gold.fact_ranking_pair\n",
+        "  WHERE\n",
+        "    ranking_run_code = 'SEN'\n",
+        "),\n",
+        "raw_data AS (\n",
+        "  SELECT\n",
+        "    f.ranking_year,\n",
+        "    f.ranking_week,\n",
+        "    f.ranking_year * 100 + f.ranking_week AS period_key,\n",
+        "    f.current_rank,\n",
+        "    f.points AS ranking_points,\n",
+        "    (f.ranking_year * 100 + f.ranking_week) = l.mk AS is_current_week\n",
+        "  FROM\n",
+        "    wttrankingsbi.gold.fact_ranking_pair f\n",
+        "      JOIN my_pairs mp\n",
+        "        ON f.ittfid = mp.pair_id\n",
+        "      CROSS JOIN lp l\n",
+        "  WHERE\n",
+        "    f.ranking_run_code = 'SEN'\n",
+        "    AND f.current_rank IS NOT NULL\n",
+        "),\n",
+        "best_per_week AS (\n",
+        "  SELECT\n",
+        "    ranking_year,\n",
+        "    ranking_week,\n",
+        "    period_key,\n",
+        "    MIN(current_rank) AS current_rank,\n",
+        "    MAX(ranking_points) AS ranking_points,\n",
+        "    BOOL_OR(is_current_week) AS is_current_week\n",
+        "  FROM\n",
+        "    raw_data\n",
+        "  GROUP BY\n",
+        "    ranking_year,\n",
+        "    ranking_week,\n",
+        "    period_key\n",
+        ")\n",
+        "SELECT\n",
+        "  ranking_year,\n",
+        "  ranking_week,\n",
+        "  CONCAT(\n",
+        "    CAST(ranking_year AS STRING),\n",
+        "    ' W',\n",
+        "    LPAD(CAST(ranking_week AS STRING), 2, '0')\n",
+        "  ) AS period_label,\n",
+        "  period_key,\n",
+        "  current_rank,\n",
+        "  ranking_points,\n",
+        "  (period_key = MAX(period_key) OVER ()) AND (period_key = (SELECT mk FROM lp)) AS is_current_week,\n",
+        "  (period_key = MAX(period_key) OVER ()) AND (period_key != (SELECT mk FROM lp)) AS is_last_ranked,\n",
+        "  CASE\n",
+        "    WHEN (period_key = MAX(period_key) OVER ()) AND (period_key = (SELECT mk FROM lp)) THEN\n",
+        "      CONCAT('Current — Rank #', CAST(current_rank AS STRING), ' | ', CAST(ranking_year AS STRING), ' W', LPAD(CAST(ranking_week AS STRING), 2, '0'))\n",
+        "    WHEN (period_key = MAX(period_key) OVER ()) AND (period_key != (SELECT mk FROM lp)) THEN\n",
+        "      CONCAT('Last Ranked — Rank #', CAST(current_rank AS STRING), ' | ', CAST(ranking_year AS STRING), ' W', LPAD(CAST(ranking_week AS STRING), 2, '0'))\n",
+        "  END AS current_annotation\n",
+        "FROM\n",
+        "  best_per_week\n",
+        "ORDER BY\n",
+        "  ranking_year,\n",
+        "  ranking_week"
+      ],
+      "parameters": [
+        {
+          "displayName": "Player",
+          "keyword": "p_ittfid",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "WANG Chuqin (121558)"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "trend_xd",
+      "displayName": "Trend — Mixed Doubles",
+      "queryLines": [
+        "WITH params AS (\n",
+        "  SELECT\n",
+        "    COALESCE(REGEXP_EXTRACT(:p_ittfid, '\\\\(([0-9]+)\\\\)', 1), '121558') AS pid\n",
+        "),\n",
+        "my_pairs AS (\n",
+        "  SELECT\n",
+        "    dpr.ittfid AS pair_id\n",
+        "  FROM\n",
+        "    wttrankingsbi.gold.dim_pair dpr\n",
+        "      JOIN params p\n",
+        "        ON (\n",
+        "          dpr.partner1_ittfid = p.pid\n",
+        "          OR dpr.partner2_ittfid = p.pid\n",
+        "        )\n",
+        "  WHERE\n",
+        "    dpr.subevent_code = 'XD'\n",
+        "),\n",
+        "lp AS (\n",
+        "  SELECT\n",
+        "    MAX(ranking_year * 100 + ranking_week) AS mk\n",
+        "  FROM\n",
+        "    wttrankingsbi.gold.fact_ranking_pair\n",
+        "  WHERE\n",
+        "    ranking_run_code = 'SEN'\n",
+        "),\n",
+        "raw_data AS (\n",
+        "  SELECT\n",
+        "    f.ranking_year,\n",
+        "    f.ranking_week,\n",
+        "    f.ranking_year * 100 + f.ranking_week AS period_key,\n",
+        "    f.current_rank,\n",
+        "    f.points AS ranking_points,\n",
+        "    (f.ranking_year * 100 + f.ranking_week) = l.mk AS is_current_week\n",
+        "  FROM\n",
+        "    wttrankingsbi.gold.fact_ranking_pair f\n",
+        "      JOIN my_pairs mp\n",
+        "        ON f.ittfid = mp.pair_id\n",
+        "      CROSS JOIN lp l\n",
+        "  WHERE\n",
+        "    f.ranking_run_code = 'SEN'\n",
+        "    AND f.current_rank IS NOT NULL\n",
+        "),\n",
+        "best_per_week AS (\n",
+        "  SELECT\n",
+        "    ranking_year,\n",
+        "    ranking_week,\n",
+        "    period_key,\n",
+        "    MIN(current_rank) AS current_rank,\n",
+        "    MAX(ranking_points) AS ranking_points,\n",
+        "    BOOL_OR(is_current_week) AS is_current_week\n",
+        "  FROM\n",
+        "    raw_data\n",
+        "  GROUP BY\n",
+        "    ranking_year,\n",
+        "    ranking_week,\n",
+        "    period_key\n",
+        ")\n",
+        "SELECT\n",
+        "  ranking_year,\n",
+        "  ranking_week,\n",
+        "  CONCAT(\n",
+        "    CAST(ranking_year AS STRING),\n",
+        "    ' W',\n",
+        "    LPAD(CAST(ranking_week AS STRING), 2, '0')\n",
+        "  ) AS period_label,\n",
+        "  period_key,\n",
+        "  current_rank,\n",
+        "  ranking_points,\n",
+        "  (period_key = MAX(period_key) OVER ()) AND (period_key = (SELECT mk FROM lp)) AS is_current_week,\n",
+        "  (period_key = MAX(period_key) OVER ()) AND (period_key != (SELECT mk FROM lp)) AS is_last_ranked,\n",
+        "  CASE\n",
+        "    WHEN (period_key = MAX(period_key) OVER ()) AND (period_key = (SELECT mk FROM lp)) THEN\n",
+        "      CONCAT('Current — Rank #', CAST(current_rank AS STRING), ' | ', CAST(ranking_year AS STRING), ' W', LPAD(CAST(ranking_week AS STRING), 2, '0'))\n",
+        "    WHEN (period_key = MAX(period_key) OVER ()) AND (period_key != (SELECT mk FROM lp)) THEN\n",
+        "      CONCAT('Last Ranked — Rank #', CAST(current_rank AS STRING), ' | ', CAST(ranking_year AS STRING), ' W', LPAD(CAST(ranking_week AS STRING), 2, '0'))\n",
+        "  END AS current_annotation\n",
+        "FROM\n",
+        "  best_per_week\n",
+        "ORDER BY\n",
+        "  ranking_year,\n",
+        "  ranking_week"
+      ],
+      "parameters": [
+        {
+          "displayName": "Player",
+          "keyword": "p_ittfid",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "WANG Chuqin (121558)"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "trend_singles",
+      "displayName": "Trend — Singles",
+      "queryLines": [
+        "WITH params AS (\n",
+        "  SELECT\n",
+        "    COALESCE(REGEXP_EXTRACT(:p_ittfid, '\\\\(([0-9]+)\\\\)', 1), '121558') AS pid\n",
+        "),\n",
+        "gc AS (\n",
+        "  SELECT\n",
+        "    CASE\n",
+        "      WHEN UPPER(gender) LIKE 'M%' THEN 'MS'\n",
+        "      ELSE 'WS'\n",
+        "    END AS code\n",
+        "  FROM\n",
+        "    wttrankingsbi.gold.dim_player dp\n",
+        "      JOIN params p\n",
+        "        ON dp.ittfid = p.pid\n",
+        "),\n",
+        "li AS (\n",
+        "  SELECT\n",
+        "    MAX(ranking_year * 100 + ranking_week) AS mk\n",
+        "  FROM\n",
+        "    wttrankingsbi.gold.fact_ranking_individual\n",
+        "  WHERE\n",
+        "    ranking_run_code = 'SEN'\n",
+        ")\n",
+        "SELECT\n",
+        "  f.ranking_year,\n",
+        "  f.ranking_week,\n",
+        "  CONCAT(\n",
+        "    CAST(f.ranking_year AS STRING),\n",
+        "    ' W',\n",
+        "    LPAD(CAST(f.ranking_week AS STRING), 2, '0')\n",
+        "  ) AS period_label,\n",
+        "  f.ranking_year * 100 + f.ranking_week AS period_key,\n",
+        "  f.current_rank,\n",
+        "  f.ranking_points_ytd AS ranking_points,\n",
+        "  (f.ranking_year * 100 + f.ranking_week) = l.mk AS is_current_week,\n",
+        "  ((f.ranking_year * 100 + f.ranking_week) = MAX(f.ranking_year * 100 + f.ranking_week) OVER ()) AND ((f.ranking_year * 100 + f.ranking_week) != l.mk) AS is_last_ranked,\n",
+        "  CASE\n",
+        "    WHEN (f.ranking_year * 100 + f.ranking_week) = l.mk THEN\n",
+        "      CONCAT('Current — Rank #', CAST(f.current_rank AS STRING), ' | ', CAST(f.ranking_year AS STRING), ' W', LPAD(CAST(f.ranking_week AS STRING), 2, '0'))\n",
+        "    WHEN ((f.ranking_year * 100 + f.ranking_week) = MAX(f.ranking_year * 100 + f.ranking_week) OVER ()) AND ((f.ranking_year * 100 + f.ranking_week) != l.mk) THEN\n",
+        "      CONCAT('Last Ranked — Rank #', CAST(f.current_rank AS STRING), ' | ', CAST(f.ranking_year AS STRING), ' W', LPAD(CAST(f.ranking_week AS STRING), 2, '0'))\n",
+        "  END AS current_annotation\n",
+        "FROM\n",
+        "  wttrankingsbi.gold.fact_ranking_individual f\n",
+        "    JOIN params p\n",
+        "      ON f.ittfid = p.pid\n",
+        "    JOIN gc g\n",
+        "      ON f.subevent_code = g.code\n",
+        "    CROSS JOIN li l\n",
+        "WHERE\n",
+        "  f.ranking_run_code = 'SEN'\n",
+        "  AND f.current_rank IS NOT NULL\n",
+        "ORDER BY\n",
+        "  f.ranking_year,\n",
+        "  f.ranking_week"
+      ],
+      "parameters": [
+        {
+          "displayName": "Player",
+          "keyword": "p_ittfid",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "WANG Chuqin (121558)"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "player_options",
+      "displayName": "Player Options",
+      "queryLines": [
+        "SELECT\n",
+        "  CONCAT(player_name, ' (', CAST(ittfid AS STRING), ')') AS display_label\n",
+        "FROM\n",
+        "  wttrankingsbi.gold.dim_player\n",
+        "WHERE\n",
+        "  player_name IS NOT NULL\n",
+        "ORDER BY\n",
+        "  player_name"
+      ]
+    },
+    {
+      "name": "player_cards",
+      "displayName": "Player Cards",
+      "queryLines": [
+        "WITH params AS (\n",
+        "  SELECT\n",
+        "    COALESCE(REGEXP_EXTRACT(:p_ittfid, '\\\\(([0-9]+)\\\\)', 1), '121558') AS pid\n",
+        "),\n",
+        "player AS (\n",
+        "  SELECT\n",
+        "    dp.ittfid,\n",
+        "    dp.player_name,\n",
+        "    CASE\n",
+        "      WHEN UPPER(dp.gender) LIKE 'M%' THEN CONCAT('Men', chr(39), 's')\n",
+        "      ELSE CONCAT('Women', chr(39), 's')\n",
+        "    END AS glabel,\n",
+        "    CASE\n",
+        "      WHEN UPPER(dp.gender) LIKE 'M%' THEN 'MS'\n",
+        "      ELSE 'WS'\n",
+        "    END AS s_code,\n",
+        "    CASE\n",
+        "      WHEN UPPER(dp.gender) LIKE 'M%' THEN 'MD'\n",
+        "      ELSE 'WD'\n",
+        "    END AS d_code,\n",
+        "    CASE\n",
+        "      WHEN UPPER(dp.gender) LIKE 'M%' THEN 'MDI'\n",
+        "      ELSE 'WDI'\n",
+        "    END AS di_code\n",
+        "  FROM\n",
+        "    wttrankingsbi.gold.dim_player dp\n",
+        "  WHERE\n",
+        "    dp.ittfid\n",
+        "      = (\n",
+        "        SELECT\n",
+        "          pid\n",
+        "        FROM\n",
+        "          params\n",
+        "      )\n",
+        "),\n",
+        "li AS (\n",
+        "  SELECT\n",
+        "    MAX(ranking_year * 100 + ranking_week) AS mk,\n",
+        "    CAST(MAX(ranking_year * 100 + ranking_week) / 100 AS INT) AS ly,\n",
+        "    CAST(MAX(ranking_year * 100 + ranking_week) % 100 AS INT) AS lw\n",
+        "  FROM\n",
+        "    wttrankingsbi.gold.fact_ranking_individual\n",
+        "  WHERE\n",
+        "    ranking_run_code = 'SEN'\n",
+        "),\n",
+        "ind_all AS (\n",
+        "  SELECT\n",
+        "    f.subevent_code,\n",
+        "    f.current_rank,\n",
+        "    f.ranking_year,\n",
+        "    f.ranking_week,\n",
+        "    f.ranking_year * 100 + f.ranking_week AS pk\n",
+        "  FROM\n",
+        "    wttrankingsbi.gold.fact_ranking_individual f\n",
+        "  WHERE\n",
+        "    f.ittfid\n",
+        "      = (\n",
+        "        SELECT\n",
+        "          pid\n",
+        "        FROM\n",
+        "          params\n",
+        "      )\n",
+        "    AND f.ranking_run_code = 'SEN'\n",
+        "    AND f.current_rank IS NOT NULL\n",
+        "),\n",
+        "ind_curr AS (\n",
+        "  SELECT\n",
+        "    subevent_code,\n",
+        "    current_rank AS cr\n",
+        "  FROM\n",
+        "    ind_all\n",
+        "  WHERE\n",
+        "    pk\n",
+        "      = (\n",
+        "        SELECT\n",
+        "          mk\n",
+        "        FROM\n",
+        "          li\n",
+        "      )\n",
+        "),\n",
+        "ind_best AS (\n",
+        "  SELECT\n",
+        "    subevent_code,\n",
+        "    cr,\n",
+        "    ry,\n",
+        "    rw\n",
+        "  FROM\n",
+        "    (\n",
+        "      SELECT\n",
+        "        subevent_code,\n",
+        "        current_rank AS cr,\n",
+        "        ranking_year AS ry,\n",
+        "        ranking_week AS rw,\n",
+        "        ROW_NUMBER() OVER (\n",
+        "            PARTITION BY subevent_code\n",
+        "            ORDER BY current_rank, ranking_year, ranking_week\n",
+        "          ) AS rn\n",
+        "      FROM\n",
+        "        ind_all\n",
+        "    ) t\n",
+        "  WHERE\n",
+        "    rn = 1\n",
+        "),\n",
+        "my_pairs AS (\n",
+        "  SELECT\n",
+        "    dpr.ittfid AS pair_id,\n",
+        "    dpr.subevent_code\n",
+        "  FROM\n",
+        "    wttrankingsbi.gold.dim_pair dpr\n",
+        "  WHERE\n",
+        "    dpr.partner1_ittfid\n",
+        "      = (\n",
+        "        SELECT\n",
+        "          pid\n",
+        "        FROM\n",
+        "          params\n",
+        "      )\n",
+        "    OR dpr.partner2_ittfid\n",
+        "      = (\n",
+        "        SELECT\n",
+        "          pid\n",
+        "        FROM\n",
+        "          params\n",
+        "      )\n",
+        "),\n",
+        "lp AS (\n",
+        "  SELECT\n",
+        "    MAX(ranking_year * 100 + ranking_week) AS mk\n",
+        "  FROM\n",
+        "    wttrankingsbi.gold.fact_ranking_pair\n",
+        "  WHERE\n",
+        "    ranking_run_code = 'SEN'\n",
+        "),\n",
+        "pair_curr AS (\n",
+        "  SELECT\n",
+        "    mp.subevent_code,\n",
+        "    MIN(f.current_rank) AS cr\n",
+        "  FROM\n",
+        "    wttrankingsbi.gold.fact_ranking_pair f\n",
+        "      JOIN my_pairs mp\n",
+        "        ON f.ittfid = mp.pair_id\n",
+        "  WHERE\n",
+        "    f.ranking_run_code = 'SEN'\n",
+        "    AND f.ranking_year * 100 + f.ranking_week\n",
+        "      = (\n",
+        "        SELECT\n",
+        "          mk\n",
+        "        FROM\n",
+        "          lp\n",
+        "      )\n",
+        "  GROUP BY\n",
+        "    mp.subevent_code\n",
+        "),\n",
+        "pair_best AS (\n",
+        "  SELECT\n",
+        "    subevent_code,\n",
+        "    cr,\n",
+        "    ry,\n",
+        "    rw\n",
+        "  FROM\n",
+        "    (\n",
+        "      SELECT\n",
+        "        mp.subevent_code,\n",
+        "        f.current_rank AS cr,\n",
+        "        f.ranking_year AS ry,\n",
+        "        f.ranking_week AS rw,\n",
+        "        ROW_NUMBER() OVER (\n",
+        "            PARTITION BY mp.subevent_code\n",
+        "            ORDER BY f.current_rank, f.ranking_year, f.ranking_week\n",
+        "          ) AS rn\n",
+        "      FROM\n",
+        "        wttrankingsbi.gold.fact_ranking_pair f\n",
+        "          JOIN my_pairs mp\n",
+        "            ON f.ittfid = mp.pair_id\n",
+        "      WHERE\n",
+        "        f.ranking_run_code = 'SEN'\n",
+        "        AND f.current_rank IS NOT NULL\n",
+        "    ) t\n",
+        "  WHERE\n",
+        "    rn = 1\n",
+        ")\n",
+        "SELECT\n",
+        "  CONCAT(pl.glabel, ' Singles Ranking') AS singles_label,\n",
+        "  COALESCE(CONCAT('#', CAST(s_curr.cr AS STRING)), 'NONE') AS singles_current_rank,\n",
+        "  COALESCE(\n",
+        "    CONCAT('Week ', LPAD(CAST(l.lw AS STRING), 2, '0'), ', ', CAST(l.ly AS STRING)),\n",
+        "    ''\n",
+        "  ) AS singles_current_period,\n",
+        "  COALESCE(CONCAT('#', CAST(s_best.cr AS STRING)), 'NONE') AS singles_best_rank,\n",
+        "  COALESCE(\n",
+        "    CONCAT('Week ', LPAD(CAST(s_best.rw AS STRING), 2, '0'), ', ', CAST(s_best.ry AS STRING)),\n",
+        "    ''\n",
+        "  ) AS singles_best_period,\n",
+        "  CONCAT(pl.glabel, ' Doubles Ranking') AS doubles_label,\n",
+        "  COALESCE(CONCAT('#', CAST(d_curr.cr AS STRING)), 'NONE') AS doubles_current_rank,\n",
+        "  COALESCE(\n",
+        "    CONCAT('Week ', LPAD(CAST(l.lw AS STRING), 2, '0'), ', ', CAST(l.ly AS STRING)),\n",
+        "    ''\n",
+        "  ) AS doubles_current_period,\n",
+        "  COALESCE(CONCAT('#', CAST(d_best.cr AS STRING)), 'NONE') AS doubles_best_rank,\n",
+        "  COALESCE(\n",
+        "    CONCAT('Week ', LPAD(CAST(d_best.rw AS STRING), 2, '0'), ', ', CAST(d_best.ry AS STRING)),\n",
+        "    ''\n",
+        "  ) AS doubles_best_period,\n",
+        "  CONCAT(pl.glabel, ' Doubles Individual Ranking') AS doublesind_label,\n",
+        "  COALESCE(CONCAT('#', CAST(di_curr.cr AS STRING)), 'NONE') AS doublesind_current_rank,\n",
+        "  COALESCE(\n",
+        "    CONCAT('Week ', LPAD(CAST(l.lw AS STRING), 2, '0'), ', ', CAST(l.ly AS STRING)),\n",
+        "    ''\n",
+        "  ) AS doublesind_current_period,\n",
+        "  COALESCE(CONCAT('#', CAST(di_best.cr AS STRING)), 'NONE') AS doublesind_best_rank,\n",
+        "  COALESCE(\n",
+        "    CONCAT('Week ', LPAD(CAST(di_best.rw AS STRING), 2, '0'), ', ', CAST(di_best.ry AS STRING)),\n",
+        "    ''\n",
+        "  ) AS doublesind_best_period,\n",
+        "  'Mixed Doubles Ranking' AS xd_label,\n",
+        "  COALESCE(CONCAT('#', CAST(xd_curr.cr AS STRING)), 'NONE') AS xd_current_rank,\n",
+        "  COALESCE(\n",
+        "    CONCAT('Week ', LPAD(CAST(l.lw AS STRING), 2, '0'), ', ', CAST(l.ly AS STRING)),\n",
+        "    ''\n",
+        "  ) AS xd_current_period,\n",
+        "  COALESCE(CONCAT('#', CAST(xd_best.cr AS STRING)), 'NONE') AS xd_best_rank,\n",
+        "  COALESCE(\n",
+        "    CONCAT('Week ', LPAD(CAST(xd_best.rw AS STRING), 2, '0'), ', ', CAST(xd_best.ry AS STRING)),\n",
+        "    ''\n",
+        "  ) AS xd_best_period,\n",
+        "  'Mixed Doubles Individual Ranking' AS xdi_label,\n",
+        "  COALESCE(CONCAT('#', CAST(xdi_curr.cr AS STRING)), 'NONE') AS xdi_current_rank,\n",
+        "  COALESCE(\n",
+        "    CONCAT('Week ', LPAD(CAST(l.lw AS STRING), 2, '0'), ', ', CAST(l.ly AS STRING)),\n",
+        "    ''\n",
+        "  ) AS xdi_current_period,\n",
+        "  COALESCE(CONCAT('#', CAST(xdi_best.cr AS STRING)), 'NONE') AS xdi_best_rank,\n",
+        "  COALESCE(\n",
+        "    CONCAT('Week ', LPAD(CAST(xdi_best.rw AS STRING), 2, '0'), ', ', CAST(xdi_best.ry AS STRING)),\n",
+        "    ''\n",
+        "  ) AS xdi_best_period,\n",
+        "  CONCAT(\n",
+        "    '<div style=\"width:100%;height:220px;background-image:url(',\n",
+        "    chr(39),\n",
+        "    'https://photofiles.worldtabletennis.com/wtt-media/photos/400px/',\n",
+        "    p.pid,\n",
+        "    '_Headshot_R_',\n",
+        "    REPLACE(pl.player_name, ' ', '_'),\n",
+        "    '.png',\n",
+        "    chr(39),\n",
+        "    '),url(',\n",
+        "    chr(39),\n",
+        "    'https://photofiles.worldtabletennis.com/wtt-media/photos/400px/',\n",
+        "    p.pid,\n",
+        "    '_HEADSHOT_R_',\n",
+        "    REPLACE(pl.player_name, ' ', '_'),\n",
+        "    '.png',\n",
+        "    chr(39),\n",
+        "    ');background-size:contain;background-repeat:no-repeat;background-position:center\"></div>'\n",
+        "  ) AS image_html\n",
+        "FROM\n",
+        "  params p\n",
+        "    LEFT JOIN player pl\n",
+        "      ON TRUE\n",
+        "    LEFT JOIN li l\n",
+        "      ON TRUE\n",
+        "    LEFT JOIN ind_curr s_curr\n",
+        "      ON s_curr.subevent_code = pl.s_code\n",
+        "    LEFT JOIN ind_best s_best\n",
+        "      ON s_best.subevent_code = pl.s_code\n",
+        "    LEFT JOIN pair_curr d_curr\n",
+        "      ON d_curr.subevent_code = pl.d_code\n",
+        "    LEFT JOIN pair_best d_best\n",
+        "      ON d_best.subevent_code = pl.d_code\n",
+        "    LEFT JOIN ind_curr di_curr\n",
+        "      ON di_curr.subevent_code = pl.di_code\n",
+        "    LEFT JOIN ind_best di_best\n",
+        "      ON di_best.subevent_code = pl.di_code\n",
+        "    LEFT JOIN pair_curr xd_curr\n",
+        "      ON xd_curr.subevent_code = 'XD'\n",
+        "    LEFT JOIN pair_best xd_best\n",
+        "      ON xd_best.subevent_code = 'XD'\n",
+        "    LEFT JOIN ind_curr xdi_curr\n",
+        "      ON xdi_curr.subevent_code = 'XDI'\n",
+        "    LEFT JOIN ind_best xdi_best\n",
+        "      ON xdi_best.subevent_code = 'XDI'"
+      ],
+      "parameters": [
+        {
+          "displayName": "Player",
+          "keyword": "p_ittfid",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "WANG Chuqin (121558)"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "0df80881",
+      "displayName": "Executive Summary",
+      "layout": [
+        {
+          "widget": {
+            "name": "total-ranked-athletes",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "6e268573",
+                  "fields": [
+                    {
+                      "name": "sum(total_individuals)",
+                      "expression": "SUM(`total_individuals`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "<span style=\"font-size: 12px;\">Total Ranked Athletes</span>",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(total_individuals)"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "7edbbc12",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "3c6ecd64",
+                  "fields": [
+                    {
+                      "name": "subevent_code",
+                      "expression": "`subevent_code`"
+                    },
+                    {
+                      "name": "rank",
+                      "expression": "`rank`"
+                    },
+                    {
+                      "name": "country_name",
+                      "expression": "`country_name`"
+                    },
+                    {
+                      "name": "ranked_player_count",
+                      "expression": "`ranked_player_count`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": {
+                  "value": "Top 3 Federations by Subevent",
+                  "fields": []
+                },
+                "description": {
+                  "value": "Highest ranked-player counts per subevent (Senior)",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "rowsPerPage": 24,
+              "displayRowNumbers": false,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "subevent_code",
+                    "headerAlignment": "center",
+                    "contentAlignment": "center",
+                    "displayName": "Evt",
+                    "style": {
+                      "type": "basic",
+                      "fontWeight": 700,
+                      "rules": [
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "MS"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#1B9E77",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "WS"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#D95F02",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "MD"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#7570B3",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "MDI"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#E7298A",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "WD"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#66A61E",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "WDI"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#E6AB02",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "XD"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#A6761D",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "XDI"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#666666",
+                          "foregroundColor": "#FFFFFF"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "fieldName": "rank",
+                    "headerAlignment": "center",
+                    "contentAlignment": "center",
+                    "displayName": "#",
+                    "style": {
+                      "type": "basic",
+                      "rules": [
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "MS"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#1B9E77",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "WS"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#D95F02",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "MD"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#7570B3",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "MDI"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#E7298A",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "WD"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#66A61E",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "WDI"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#E6AB02",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "XD"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#A6761D",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "XDI"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#666666",
+                          "foregroundColor": "#FFFFFF"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "fieldName": "country_name",
+                    "displayName": "Federation",
+                    "style": {
+                      "type": "basic",
+                      "rules": [
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "MS"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#1B9E77",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "WS"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#D95F02",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "MD"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#7570B3",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "MDI"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#E7298A",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "WD"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#66A61E",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "WDI"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#E6AB02",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "XD"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#A6761D",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "XDI"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#666666",
+                          "foregroundColor": "#FFFFFF"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "fieldName": "ranked_player_count",
+                    "headerAlignment": "right",
+                    "contentAlignment": "right",
+                    "displayName": "Count",
+                    "style": {
+                      "type": "basic",
+                      "rules": [
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "MS"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#1B9E77",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "WS"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#D95F02",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "MD"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#7570B3",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "MDI"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#E7298A",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "WD"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#66A61E",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "WDI"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#E6AB02",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "XD"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#A6761D",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "XDI"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#666666",
+                          "foregroundColor": "#FFFFFF"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 4,
+            "width": 6,
+            "height": 8
+          }
+        },
+        {
+          "widget": {
+            "name": "2d61a835",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "8fd6495e",
+                  "fields": [
+                    {
+                      "name": "countries",
+                      "expression": "`countries`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "<span style=\"font-size: 12px;\">Federations Represented</span>",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "countries"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 2,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "b4806148",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "3c9f20a7",
+                  "fields": [
+                    {
+                      "name": "new_entrants",
+                      "expression": "`new_entrants`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "<span style=\"font-size: 12px;\">New Entrants</span>",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "new_entrants"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 2,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "8b462d15",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "6f57c55d",
+                  "fields": [
+                    {
+                      "name": "years_tracked",
+                      "expression": "`years_tracked`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "<span style=\"font-size: 12px;\">Years Tracked</span>",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "years_tracked"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 2,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "952519da",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "cd587df8",
+                  "fields": [
+                    {
+                      "name": "pct_junior",
+                      "expression": "`pct_junior`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "<span style=\"font-size: 12px;\">Junior Pipeline</span> %",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "pct_junior",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "none",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 1
+                    }
+                  },
+                  "formatTemplate": "{{ @formatted }}%"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 2,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "header",
+            "multilineTextboxSpec": {
+              "lines": [
+                "# <span style=\"font-size: 24px;\">WTT Rankings — Executive Overview</span>\n",
+                "\n",
+                "<span style=\"font-size: 18px;\">Key performance indicators across all ranking categories and subevents</span>"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "counter_subevents",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "8f270eef",
+                  "fields": [
+                    {
+                      "name": "countdistinct(subevent_code)",
+                      "expression": "COUNT(DISTINCT `subevent_code`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "<span style=\"font-size: 12px;\">Subevents</span>",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "countdistinct(subevent_code)"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 10,
+            "y": 2,
+            "width": 2,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "world_ones",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "world_number_ones",
+                  "fields": [
+                    {
+                      "name": "subevent_code",
+                      "expression": "`subevent_code`"
+                    },
+                    {
+                      "name": "player_name",
+                      "expression": "`player_name`"
+                    },
+                    {
+                      "name": "country_code",
+                      "expression": "`country_code`"
+                    },
+                    {
+                      "name": "ranking_points_ytd",
+                      "expression": "`ranking_points_ytd`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": {
+                  "value": "World #1 by Subevent",
+                  "fields": []
+                },
+                "description": {
+                  "value": "Reigning leaders across all Senior disciplines",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "rowsPerPage": 10,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "subevent_code",
+                    "headerAlignment": "center",
+                    "contentAlignment": "center",
+                    "displayName": "Evt",
+                    "style": {
+                      "type": "basic",
+                      "fontWeight": 700,
+                      "rules": [
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "MS"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#1B9E77",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "WS"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#D95F02",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "MD"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#7570B3",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "MDI"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#E7298A",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "WD"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#66A61E",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "WDI"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#E6AB02",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "XD"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#A6761D",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "XDI"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#666666",
+                          "foregroundColor": "#FFFFFF"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "fieldName": "player_name",
+                    "displayName": "Player"
+                  },
+                  {
+                    "fieldName": "country_code",
+                    "headerAlignment": "center",
+                    "contentAlignment": "center",
+                    "displayName": "Fed"
+                  },
+                  {
+                    "fieldName": "ranking_points_ytd",
+                    "headerAlignment": "right",
+                    "contentAlignment": "right",
+                    "format": {
+                      "type": "number-plain",
+                      "abbreviation": "none"
+                    },
+                    "displayName": "Points"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 4,
+            "width": 6,
+            "height": 8
+          }
+        },
+        {
+          "widget": {
+            "name": "top_risers",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "top_risers",
+                  "fields": [
+                    {
+                      "name": "player_name",
+                      "expression": "`player_name`"
+                    },
+                    {
+                      "name": "country_code",
+                      "expression": "`country_code`"
+                    },
+                    {
+                      "name": "subevent_code",
+                      "expression": "`subevent_code`"
+                    },
+                    {
+                      "name": "previous_rank",
+                      "expression": "`previous_rank`"
+                    },
+                    {
+                      "name": "current_rank",
+                      "expression": "`current_rank`"
+                    },
+                    {
+                      "name": "ranking_difference",
+                      "expression": "`ranking_difference`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": {
+                  "value": "Biggest Risers This Period",
+                  "fields": []
+                },
+                "description": {
+                  "value": "Senior players with largest rank improvement",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "rowsPerPage": 10,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "player_name",
+                    "displayName": "Player"
+                  },
+                  {
+                    "fieldName": "country_code",
+                    "headerAlignment": "center",
+                    "contentAlignment": "center",
+                    "displayName": "Fed"
+                  },
+                  {
+                    "fieldName": "subevent_code",
+                    "headerAlignment": "center",
+                    "contentAlignment": "center",
+                    "displayName": "Evt",
+                    "style": {
+                      "type": "basic",
+                      "fontWeight": 700,
+                      "rules": [
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "MS"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#1B9E77",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "WS"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#D95F02",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "MD"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#7570B3",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "MDI"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#E7298A",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "WD"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#66A61E",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "WDI"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#E6AB02",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "XD"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#A6761D",
+                          "foregroundColor": "#FFFFFF"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "XDI"
+                            },
+                            "operator": "=",
+                            "fieldName": "subevent_code"
+                          },
+                          "backgroundColor": "#666666",
+                          "foregroundColor": "#FFFFFF"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "fieldName": "previous_rank",
+                    "headerAlignment": "center",
+                    "contentAlignment": "center",
+                    "displayName": "Prev"
+                  },
+                  {
+                    "fieldName": "current_rank",
+                    "headerAlignment": "center",
+                    "contentAlignment": "center",
+                    "displayName": "Now"
+                  },
+                  {
+                    "fieldName": "ranking_difference",
+                    "headerAlignment": "center",
+                    "contentAlignment": "center",
+                    "displayName": "▲",
+                    "style": {
+                      "type": "basic",
+                      "fontWeight": 700,
+                      "foregroundColor": "#16A34A"
+                    }
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 12,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "discipline_breakdown",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "8f270eef",
+                  "fields": [
+                    {
+                      "name": "subevent_code",
+                      "expression": "`subevent_code`"
+                    },
+                    {
+                      "name": "sum(ranked_count)",
+                      "expression": "SUM(`ranked_count`)"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`ranking_run_code` IN ('SEN')"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": {
+                  "value": "Discipline Landscape",
+                  "fields": []
+                },
+                "description": {
+                  "value": "Total ranked athletes per subevent (Senior)",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "subevent_code",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(ranked_count)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "subevent_code",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 12,
+            "width": 6,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "continental_table",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "571e2856",
+                  "fields": [
+                    {
+                      "name": "continent_name",
+                      "expression": "`continent_name`"
+                    },
+                    {
+                      "name": "sum(ranked_individuals)",
+                      "expression": "SUM(`ranked_individuals`)"
+                    }
+                  ],
+                  "disaggregated": false,
+                  "orders": [
+                    {
+                      "direction": "DESC",
+                      "expression": "SUM(`ranked_individuals`)"
+                    }
+                  ]
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Athletes by Continent",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "rowsPerPage": 6,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "continent_name",
+                    "displayName": "Continent"
+                  },
+                  {
+                    "fieldName": "sum(ranked_individuals)",
+                    "headerAlignment": "right",
+                    "contentAlignment": "right",
+                    "displayName": "Athletes"
+                  }
+                ],
+                "rowOrder": [
+                  {
+                    "by": "column-reversed",
+                    "field": {
+                      "index": 1
+                    }
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 18,
+            "width": 4,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "fresh_faces",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "bbc834d1",
+                  "fields": [
+                    {
+                      "name": "subevent_code",
+                      "expression": "`subevent_code`"
+                    },
+                    {
+                      "name": "sum(total_count)",
+                      "expression": "SUM(`total_count`)"
+                    },
+                    {
+                      "name": "sum(new_entrant_count)",
+                      "expression": "SUM(`new_entrant_count`)"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`ranking_run_code` IN ('SEN')"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "New Entrants by Discipline",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "rowsPerPage": 10,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "subevent_code",
+                    "headerAlignment": "center",
+                    "contentAlignment": "center",
+                    "displayName": "Evt"
+                  },
+                  {
+                    "fieldName": "sum(total_count)",
+                    "headerAlignment": "right",
+                    "contentAlignment": "right",
+                    "displayName": "Total"
+                  },
+                  {
+                    "fieldName": "sum(new_entrant_count)",
+                    "headerAlignment": "right",
+                    "contentAlignment": "right",
+                    "displayName": "New",
+                    "style": {
+                      "type": "basic",
+                      "fontWeight": 700,
+                      "foregroundColor": "#16A34A"
+                    }
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 19,
+            "width": 4,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "top_points",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "top_avg_points",
+                  "fields": [
+                    {
+                      "name": "country_name",
+                      "expression": "`country_name`"
+                    },
+                    {
+                      "name": "avg_pts",
+                      "expression": "`avg_pts`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Highest Avg Points by Federation",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "rowsPerPage": 8,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "country_name",
+                    "displayName": "Federation"
+                  },
+                  {
+                    "fieldName": "avg_pts",
+                    "headerAlignment": "right",
+                    "contentAlignment": "right",
+                    "format": {
+                      "type": "number-plain",
+                      "abbreviation": "none"
+                    },
+                    "displayName": "Avg Pts"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 19,
+            "width": 4,
+            "height": 5
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "070af2ce",
+      "displayName": "Global Filters",
+      "pageType": "PAGE_TYPE_GLOBAL_FILTERS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "bd4b43a2",
+      "displayName": "Player Performance",
+      "layout": [
+        {
+          "widget": {
+            "name": "player_filter",
+            "queries": [
+              {
+                "name": "dashboards/01f1af6da66b150ab9e1633be6dce7a3/datasets/01f1b021ecd81dc3b13681b8d65fb64f_display_label",
+                "query": {
+                  "datasetName": "player_options",
+                  "fields": [
+                    {
+                      "name": "display_label",
+                      "expression": "`display_label`"
+                    },
+                    {
+                      "name": "display_label_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_dashboards/01f1af6da66b150ab9e1633be6dce7a3/datasets/01f1b021a75a1e51b6d77e16b62ad630_p_ittfid",
+                "query": {
+                  "datasetName": "player_facts",
+                  "parameters": [
+                    {
+                      "name": "p_ittfid",
+                      "keyword": "p_ittfid"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_dashboards/01f1af6da66b150ab9e1633be6dce7a3/datasets/01f1b16e60bc1c64a4700bfe2b04bda9_p_ittfid",
+                "query": {
+                  "datasetName": "player_cards",
+                  "parameters": [
+                    {
+                      "name": "p_ittfid",
+                      "keyword": "p_ittfid"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_dashboards/01f1af6da66b150ab9e1633be6dce7a3/datasets/01f1b021ae651c829a855f353305b7be_p_ittfid",
+                "query": {
+                  "datasetName": "trend_singles",
+                  "parameters": [
+                    {
+                      "name": "p_ittfid",
+                      "keyword": "p_ittfid"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_dashboards/01f1af6da66b150ab9e1633be6dce7a3/datasets/01f1b021ab4418c5a2e042b4ccae7d5b_p_ittfid",
+                "query": {
+                  "datasetName": "trend_doubles",
+                  "parameters": [
+                    {
+                      "name": "p_ittfid",
+                      "keyword": "p_ittfid"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_dashboards/01f1af6da66b150ab9e1633be6dce7a3/datasets/01f1b021a49a1b66b66de19aa9669c8c_p_ittfid",
+                "query": {
+                  "datasetName": "trend_doubles_ind",
+                  "parameters": [
+                    {
+                      "name": "p_ittfid",
+                      "keyword": "p_ittfid"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_dashboards/01f1af6da66b150ab9e1633be6dce7a3/datasets/01f1b021ac7e1c719d4e820c74eda707_p_ittfid",
+                "query": {
+                  "datasetName": "trend_xd",
+                  "parameters": [
+                    {
+                      "name": "p_ittfid",
+                      "keyword": "p_ittfid"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_dashboards/01f1af6da66b150ab9e1633be6dce7a3/datasets/01f1b021aa5916828c7e618adc71d3d7_p_ittfid",
+                "query": {
+                  "datasetName": "trend_xdi",
+                  "parameters": [
+                    {
+                      "name": "p_ittfid",
+                      "keyword": "p_ittfid"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "scale": {
+                "type": "categorical",
+                "sort": {
+                  "by": "natural-order"
+                }
+              },
+              "version": 2,
+              "selection": {
+                "defaultSelection": {
+                  "values": {
+                    "dataType": "STRING",
+                    "values": [
+                      {
+                        "value": "WANG Chuqin (121558)"
+                      }
+                    ]
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Player",
+                  "fields": []
+                }
+              },
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "display_label",
+                    "queryName": "dashboards/01f1af6da66b150ab9e1633be6dce7a3/datasets/01f1b021ecd81dc3b13681b8d65fb64f_display_label"
+                  },
+                  {
+                    "parameterName": "p_ittfid",
+                    "queryName": "parameter_dashboards/01f1af6da66b150ab9e1633be6dce7a3/datasets/01f1b021a75a1e51b6d77e16b62ad630_p_ittfid"
+                  },
+                  {
+                    "parameterName": "p_ittfid",
+                    "queryName": "parameter_dashboards/01f1af6da66b150ab9e1633be6dce7a3/datasets/01f1b16e60bc1c64a4700bfe2b04bda9_p_ittfid"
+                  },
+                  {
+                    "parameterName": "p_ittfid",
+                    "queryName": "parameter_dashboards/01f1af6da66b150ab9e1633be6dce7a3/datasets/01f1b021ae651c829a855f353305b7be_p_ittfid"
+                  },
+                  {
+                    "parameterName": "p_ittfid",
+                    "queryName": "parameter_dashboards/01f1af6da66b150ab9e1633be6dce7a3/datasets/01f1b021ab4418c5a2e042b4ccae7d5b_p_ittfid"
+                  },
+                  {
+                    "parameterName": "p_ittfid",
+                    "queryName": "parameter_dashboards/01f1af6da66b150ab9e1633be6dce7a3/datasets/01f1b021a49a1b66b66de19aa9669c8c_p_ittfid"
+                  },
+                  {
+                    "parameterName": "p_ittfid",
+                    "queryName": "parameter_dashboards/01f1af6da66b150ab9e1633be6dce7a3/datasets/01f1b021ac7e1c719d4e820c74eda707_p_ittfid"
+                  },
+                  {
+                    "parameterName": "p_ittfid",
+                    "queryName": "parameter_dashboards/01f1af6da66b150ab9e1633be6dce7a3/datasets/01f1b021aa5916828c7e618adc71d3d7_p_ittfid"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "singles_ranking_card",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "player_cards",
+                  "fields": [
+                    {
+                      "name": "ranking_label",
+                      "expression": "`singles_label`"
+                    },
+                    {
+                      "name": "current_rank_display",
+                      "expression": "`singles_current_rank`"
+                    },
+                    {
+                      "name": "current_period_display",
+                      "expression": "`singles_current_period`"
+                    },
+                    {
+                      "name": "best_rank_display",
+                      "expression": "`singles_best_rank`"
+                    },
+                    {
+                      "name": "best_period_display",
+                      "expression": "`singles_best_period`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Singles Ranking",
+                  "fields": []
+                }
+              },
+              "jsonSpec": {
+                "type": "vega-lite",
+                "spec": "{\"$schema\":\"https://vega.github.io/schema/vega-lite/v6.json\",\"data\":{\"name\":\"databricks_query\"},\"width\":\"container\",\"height\":\"container\",\"config\":{\"autosize\":{\"type\":\"fit\",\"contains\":\"padding\"},\"view\":{\"stroke\":null},\"background\":\"transparent\",\"font\":\"Inter\"},\"layer\":[{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":13,\"fontWeight\":700,\"color\":\"#0B1F2A\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":20},\"text\":{\"field\":\"ranking_label\"}}},{\"mark\":{\"type\":\"rule\",\"color\":\"#C1121F\",\"strokeWidth\":3,\"strokeCap\":\"round\"},\"encoding\":{\"x\":{\"value\":14},\"x2\":{\"value\":50},\"y\":{\"value\":30}}},{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":9,\"fontWeight\":700,\"color\":\"#C1121F\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":48},\"text\":{\"value\":\"CURRENT\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"right\",\"fontSize\":9,\"fontWeight\":700,\"color\":\"#94A3B8\"},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width-14\"}},\"y\":{\"value\":48},\"text\":{\"value\":\"BEST\"}}},{\"mark\":{\"type\":\"rule\",\"color\":\"#E2E8F0\",\"strokeWidth\":1},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width/2\"}},\"y\":{\"value\":42},\"y2\":{\"value\":110}}},{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":32,\"fontWeight\":800,\"color\":\"#0B1F2A\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":80},\"text\":{\"field\":\"current_rank_display\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":10,\"color\":\"#64748B\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":102},\"text\":{\"field\":\"current_period_display\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"right\",\"fontSize\":32,\"fontWeight\":800,\"color\":\"#64748B\"},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width-14\"}},\"y\":{\"value\":80},\"text\":{\"field\":\"best_rank_display\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"right\",\"fontSize\":10,\"color\":\"#94A3B8\"},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width-14\"}},\"y\":{\"value\":102},\"text\":{\"field\":\"best_period_display\"}}}]}"
+              },
+              "version": 1,
+              "widgetType": "custom-vega-viz",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "ranking_label"
+                  },
+                  {
+                    "fieldName": "current_rank_display"
+                  },
+                  {
+                    "fieldName": "current_period_display"
+                  },
+                  {
+                    "fieldName": "best_rank_display"
+                  },
+                  {
+                    "fieldName": "best_period_display"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 6,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "doubles_ranking_card",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "player_cards",
+                  "fields": [
+                    {
+                      "name": "ranking_label",
+                      "expression": "`doubles_label`"
+                    },
+                    {
+                      "name": "current_rank_display",
+                      "expression": "`doubles_current_rank`"
+                    },
+                    {
+                      "name": "current_period_display",
+                      "expression": "`doubles_current_period`"
+                    },
+                    {
+                      "name": "best_rank_display",
+                      "expression": "`doubles_best_rank`"
+                    },
+                    {
+                      "name": "best_period_display",
+                      "expression": "`doubles_best_period`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": false
+              },
+              "jsonSpec": {
+                "type": "vega-lite",
+                "spec": "{\"$schema\":\"https://vega.github.io/schema/vega-lite/v6.json\",\"data\":{\"name\":\"databricks_query\"},\"width\":\"container\",\"height\":\"container\",\"config\":{\"autosize\":{\"type\":\"fit\",\"contains\":\"padding\"},\"view\":{\"stroke\":null},\"background\":\"transparent\",\"font\":\"Inter\"},\"layer\":[{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":13,\"fontWeight\":700,\"color\":\"#0B1F2A\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":20},\"text\":{\"field\":\"ranking_label\"}}},{\"mark\":{\"type\":\"rule\",\"color\":\"#C1121F\",\"strokeWidth\":3,\"strokeCap\":\"round\"},\"encoding\":{\"x\":{\"value\":14},\"x2\":{\"value\":50},\"y\":{\"value\":30}}},{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":9,\"fontWeight\":700,\"color\":\"#C1121F\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":48},\"text\":{\"value\":\"CURRENT\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"right\",\"fontSize\":9,\"fontWeight\":700,\"color\":\"#94A3B8\"},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width-14\"}},\"y\":{\"value\":48},\"text\":{\"value\":\"BEST\"}}},{\"mark\":{\"type\":\"rule\",\"color\":\"#E2E8F0\",\"strokeWidth\":1},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width/2\"}},\"y\":{\"value\":42},\"y2\":{\"value\":110}}},{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":32,\"fontWeight\":800,\"color\":\"#0B1F2A\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":80},\"text\":{\"field\":\"current_rank_display\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":10,\"color\":\"#64748B\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":102},\"text\":{\"field\":\"current_period_display\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"right\",\"fontSize\":32,\"fontWeight\":800,\"color\":\"#64748B\"},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width-14\"}},\"y\":{\"value\":80},\"text\":{\"field\":\"best_rank_display\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"right\",\"fontSize\":10,\"color\":\"#94A3B8\"},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width-14\"}},\"y\":{\"value\":102},\"text\":{\"field\":\"best_period_display\"}}}]}"
+              },
+              "version": 1,
+              "widgetType": "custom-vega-viz",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "ranking_label"
+                  },
+                  {
+                    "fieldName": "current_rank_display"
+                  },
+                  {
+                    "fieldName": "current_period_display"
+                  },
+                  {
+                    "fieldName": "best_rank_display"
+                  },
+                  {
+                    "fieldName": "best_period_display"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 6,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "doubles_individual_ranking_card",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "player_cards",
+                  "fields": [
+                    {
+                      "name": "ranking_label",
+                      "expression": "`doublesind_label`"
+                    },
+                    {
+                      "name": "current_rank_display",
+                      "expression": "`doublesind_current_rank`"
+                    },
+                    {
+                      "name": "current_period_display",
+                      "expression": "`doublesind_current_period`"
+                    },
+                    {
+                      "name": "best_rank_display",
+                      "expression": "`doublesind_best_rank`"
+                    },
+                    {
+                      "name": "best_period_display",
+                      "expression": "`doublesind_best_period`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": false
+              },
+              "jsonSpec": {
+                "type": "vega-lite",
+                "spec": "{\"$schema\":\"https://vega.github.io/schema/vega-lite/v6.json\",\"data\":{\"name\":\"databricks_query\"},\"width\":\"container\",\"height\":\"container\",\"config\":{\"autosize\":{\"type\":\"fit\",\"contains\":\"padding\"},\"view\":{\"stroke\":null},\"background\":\"transparent\",\"font\":\"Inter\"},\"layer\":[{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":13,\"fontWeight\":700,\"color\":\"#0B1F2A\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":20},\"text\":{\"field\":\"ranking_label\"}}},{\"mark\":{\"type\":\"rule\",\"color\":\"#C1121F\",\"strokeWidth\":3,\"strokeCap\":\"round\"},\"encoding\":{\"x\":{\"value\":14},\"x2\":{\"value\":50},\"y\":{\"value\":30}}},{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":9,\"fontWeight\":700,\"color\":\"#C1121F\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":48},\"text\":{\"value\":\"CURRENT\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"right\",\"fontSize\":9,\"fontWeight\":700,\"color\":\"#94A3B8\"},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width-14\"}},\"y\":{\"value\":48},\"text\":{\"value\":\"BEST\"}}},{\"mark\":{\"type\":\"rule\",\"color\":\"#E2E8F0\",\"strokeWidth\":1},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width/2\"}},\"y\":{\"value\":42},\"y2\":{\"value\":110}}},{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":32,\"fontWeight\":800,\"color\":\"#0B1F2A\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":80},\"text\":{\"field\":\"current_rank_display\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":10,\"color\":\"#64748B\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":102},\"text\":{\"field\":\"current_period_display\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"right\",\"fontSize\":32,\"fontWeight\":800,\"color\":\"#64748B\"},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width-14\"}},\"y\":{\"value\":80},\"text\":{\"field\":\"best_rank_display\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"right\",\"fontSize\":10,\"color\":\"#94A3B8\"},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width-14\"}},\"y\":{\"value\":102},\"text\":{\"field\":\"best_period_display\"}}}]}"
+              },
+              "version": 1,
+              "widgetType": "custom-vega-viz",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "ranking_label"
+                  },
+                  {
+                    "fieldName": "current_rank_display"
+                  },
+                  {
+                    "fieldName": "current_period_display"
+                  },
+                  {
+                    "fieldName": "best_rank_display"
+                  },
+                  {
+                    "fieldName": "best_period_display"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 6,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "mixed_doubles_ranking_card",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "player_cards",
+                  "fields": [
+                    {
+                      "name": "ranking_label",
+                      "expression": "`xd_label`"
+                    },
+                    {
+                      "name": "current_rank_display",
+                      "expression": "`xd_current_rank`"
+                    },
+                    {
+                      "name": "current_period_display",
+                      "expression": "`xd_current_period`"
+                    },
+                    {
+                      "name": "best_rank_display",
+                      "expression": "`xd_best_rank`"
+                    },
+                    {
+                      "name": "best_period_display",
+                      "expression": "`xd_best_period`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": false
+              },
+              "jsonSpec": {
+                "type": "vega-lite",
+                "spec": "{\"$schema\":\"https://vega.github.io/schema/vega-lite/v6.json\",\"data\":{\"name\":\"databricks_query\"},\"width\":\"container\",\"height\":\"container\",\"config\":{\"autosize\":{\"type\":\"fit\",\"contains\":\"padding\"},\"view\":{\"stroke\":null},\"background\":\"transparent\",\"font\":\"Inter\"},\"layer\":[{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":13,\"fontWeight\":700,\"color\":\"#0B1F2A\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":20},\"text\":{\"field\":\"ranking_label\"}}},{\"mark\":{\"type\":\"rule\",\"color\":\"#C1121F\",\"strokeWidth\":3,\"strokeCap\":\"round\"},\"encoding\":{\"x\":{\"value\":14},\"x2\":{\"value\":50},\"y\":{\"value\":30}}},{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":9,\"fontWeight\":700,\"color\":\"#C1121F\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":48},\"text\":{\"value\":\"CURRENT\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"right\",\"fontSize\":9,\"fontWeight\":700,\"color\":\"#94A3B8\"},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width-14\"}},\"y\":{\"value\":48},\"text\":{\"value\":\"BEST\"}}},{\"mark\":{\"type\":\"rule\",\"color\":\"#E2E8F0\",\"strokeWidth\":1},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width/2\"}},\"y\":{\"value\":42},\"y2\":{\"value\":110}}},{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":32,\"fontWeight\":800,\"color\":\"#0B1F2A\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":80},\"text\":{\"field\":\"current_rank_display\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":10,\"color\":\"#64748B\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":102},\"text\":{\"field\":\"current_period_display\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"right\",\"fontSize\":32,\"fontWeight\":800,\"color\":\"#64748B\"},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width-14\"}},\"y\":{\"value\":80},\"text\":{\"field\":\"best_rank_display\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"right\",\"fontSize\":10,\"color\":\"#94A3B8\"},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width-14\"}},\"y\":{\"value\":102},\"text\":{\"field\":\"best_period_display\"}}}]}"
+              },
+              "version": 1,
+              "widgetType": "custom-vega-viz",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "ranking_label"
+                  },
+                  {
+                    "fieldName": "current_rank_display"
+                  },
+                  {
+                    "fieldName": "current_period_display"
+                  },
+                  {
+                    "fieldName": "best_rank_display"
+                  },
+                  {
+                    "fieldName": "best_period_display"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 9,
+            "width": 6,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "mixed_doubles_individual_ranking_card",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "player_cards",
+                  "fields": [
+                    {
+                      "name": "ranking_label",
+                      "expression": "`xdi_label`"
+                    },
+                    {
+                      "name": "current_rank_display",
+                      "expression": "`xdi_current_rank`"
+                    },
+                    {
+                      "name": "current_period_display",
+                      "expression": "`xdi_current_period`"
+                    },
+                    {
+                      "name": "best_rank_display",
+                      "expression": "`xdi_best_rank`"
+                    },
+                    {
+                      "name": "best_period_display",
+                      "expression": "`xdi_best_period`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": false
+              },
+              "jsonSpec": {
+                "type": "vega-lite",
+                "spec": "{\"$schema\":\"https://vega.github.io/schema/vega-lite/v6.json\",\"data\":{\"name\":\"databricks_query\"},\"width\":\"container\",\"height\":\"container\",\"config\":{\"autosize\":{\"type\":\"fit\",\"contains\":\"padding\"},\"view\":{\"stroke\":null},\"background\":\"transparent\",\"font\":\"Inter\"},\"layer\":[{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":13,\"fontWeight\":700,\"color\":\"#0B1F2A\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":20},\"text\":{\"field\":\"ranking_label\"}}},{\"mark\":{\"type\":\"rule\",\"color\":\"#C1121F\",\"strokeWidth\":3,\"strokeCap\":\"round\"},\"encoding\":{\"x\":{\"value\":14},\"x2\":{\"value\":50},\"y\":{\"value\":30}}},{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":9,\"fontWeight\":700,\"color\":\"#C1121F\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":48},\"text\":{\"value\":\"CURRENT\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"right\",\"fontSize\":9,\"fontWeight\":700,\"color\":\"#94A3B8\"},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width-14\"}},\"y\":{\"value\":48},\"text\":{\"value\":\"BEST\"}}},{\"mark\":{\"type\":\"rule\",\"color\":\"#E2E8F0\",\"strokeWidth\":1},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width/2\"}},\"y\":{\"value\":42},\"y2\":{\"value\":110}}},{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":32,\"fontWeight\":800,\"color\":\"#0B1F2A\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":80},\"text\":{\"field\":\"current_rank_display\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":10,\"color\":\"#64748B\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":102},\"text\":{\"field\":\"current_period_display\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"right\",\"fontSize\":32,\"fontWeight\":800,\"color\":\"#64748B\"},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width-14\"}},\"y\":{\"value\":80},\"text\":{\"field\":\"best_rank_display\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"right\",\"fontSize\":10,\"color\":\"#94A3B8\"},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width-14\"}},\"y\":{\"value\":102},\"text\":{\"field\":\"best_period_display\"}}}]}"
+              },
+              "version": 1,
+              "widgetType": "custom-vega-viz",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "ranking_label"
+                  },
+                  {
+                    "fieldName": "current_rank_display"
+                  },
+                  {
+                    "fieldName": "current_period_display"
+                  },
+                  {
+                    "fieldName": "best_rank_display"
+                  },
+                  {
+                    "fieldName": "best_period_display"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 9,
+            "width": 6,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "trend_singles",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "trend_singles",
+                  "fields": [
+                    {
+                      "name": "period_label",
+                      "expression": "`period_label`"
+                    },
+                    {
+                      "name": "period_key",
+                      "expression": "`period_key`"
+                    },
+                    {
+                      "name": "current_rank",
+                      "expression": "`current_rank`"
+                    },
+                    {
+                      "name": "ranking_points",
+                      "expression": "`ranking_points`"
+                    },
+                    {
+                      "name": "is_current_week",
+                      "expression": "`is_current_week`"
+                    },
+                    {
+                      "name": "is_last_ranked",
+                      "expression": "`is_last_ranked`"
+                    },
+                    {
+                      "name": "current_annotation",
+                      "expression": "`current_annotation`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Singles — Ranking History",
+                  "fields": []
+                }
+              },
+              "jsonSpec": {
+                "type": "vega-lite",
+                "spec": "{\"$schema\":\"https://vega.github.io/schema/vega-lite/v6.json\",\"data\":{\"name\":\"databricks_query\"},\"width\":\"container\",\"height\":\"container\",\"config\":{\"autosize\":{\"type\":\"fit\",\"contains\":\"padding\"},\"view\":{\"stroke\":null},\"background\":\"transparent\",\"font\":\"Inter\"},\"layer\":[{\"mark\":{\"type\":\"line\",\"strokeWidth\":2.5,\"color\":\"#C1121F\",\"interpolate\":\"monotone\"},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"},\"axis\":{\"title\":null,\"labelExpr\":\"substring(datum.value,6)=='01'?substring(datum.value,0,4):''\",\"labelAngle\":0,\"ticks\":false,\"grid\":false,\"labelPadding\":8,\"labelFontSize\":11,\"labelColor\":\"#64748B\",\"domainColor\":\"#CBD5E1\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\",\"scale\":{\"reverse\":true},\"axis\":{\"title\":null,\"gridDash\":[3,3],\"gridColor\":\"#E2E8F0\",\"gridOpacity\":0.8,\"labelColor\":\"#64748B\",\"domainColor\":\"#CBD5E1\"}},\"tooltip\":[{\"field\":\"period_label\",\"title\":\"Period\"},{\"field\":\"current_rank\",\"title\":\"Rank\"},{\"field\":\"ranking_points\",\"title\":\"Points\"}]}},{\"transform\":[{\"filter\":\"datum.is_current_week==true\"}],\"mark\":{\"type\":\"point\",\"color\":\"#059669\",\"size\":90,\"filled\":true,\"stroke\":\"white\",\"strokeWidth\":2},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\"}}},{\"transform\":[{\"filter\":\"datum.is_current_week==true\"}],\"mark\":{\"type\":\"text\",\"align\":\"right\",\"dx\":-12,\"dy\":-12,\"fontSize\":11,\"fontWeight\":\"bold\",\"color\":\"#059669\"},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\"},\"text\":{\"field\":\"current_annotation\"}}},{\"transform\":[{\"filter\":\"datum.is_last_ranked==true\"}],\"mark\":{\"type\":\"point\",\"color\":\"#C1121F\",\"size\":90,\"filled\":true,\"stroke\":\"white\",\"strokeWidth\":2},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\"}}},{\"transform\":[{\"filter\":\"datum.is_last_ranked==true\"}],\"mark\":{\"type\":\"text\",\"align\":\"right\",\"dx\":-12,\"dy\":-12,\"fontSize\":11,\"fontWeight\":\"bold\",\"color\":\"#C1121F\"},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\"},\"text\":{\"field\":\"current_annotation\"}}}]}"
+              },
+              "version": 1,
+              "widgetType": "custom-vega-viz",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "period_label"
+                  },
+                  {
+                    "fieldName": "period_key"
+                  },
+                  {
+                    "fieldName": "current_rank"
+                  },
+                  {
+                    "fieldName": "ranking_points"
+                  },
+                  {
+                    "fieldName": "is_current_week"
+                  },
+                  {
+                    "fieldName": "is_last_ranked"
+                  },
+                  {
+                    "fieldName": "current_annotation"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 12,
+            "width": 12,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "trend_doubles",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "trend_doubles",
+                  "fields": [
+                    {
+                      "name": "period_label",
+                      "expression": "`period_label`"
+                    },
+                    {
+                      "name": "period_key",
+                      "expression": "`period_key`"
+                    },
+                    {
+                      "name": "current_rank",
+                      "expression": "`current_rank`"
+                    },
+                    {
+                      "name": "ranking_points",
+                      "expression": "`ranking_points`"
+                    },
+                    {
+                      "name": "is_current_week",
+                      "expression": "`is_current_week`"
+                    },
+                    {
+                      "name": "is_last_ranked",
+                      "expression": "`is_last_ranked`"
+                    },
+                    {
+                      "name": "current_annotation",
+                      "expression": "`current_annotation`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Doubles — Ranking History",
+                  "fields": []
+                }
+              },
+              "jsonSpec": {
+                "type": "vega-lite",
+                "spec": "{\"$schema\":\"https://vega.github.io/schema/vega-lite/v6.json\",\"data\":{\"name\":\"databricks_query\"},\"width\":\"container\",\"height\":\"container\",\"config\":{\"autosize\":{\"type\":\"fit\",\"contains\":\"padding\"},\"view\":{\"stroke\":null},\"background\":\"transparent\",\"font\":\"Inter\"},\"layer\":[{\"mark\":{\"type\":\"line\",\"strokeWidth\":2.5,\"color\":\"#1D4ED8\",\"interpolate\":\"monotone\"},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"},\"axis\":{\"title\":null,\"labelExpr\":\"substring(datum.value,6)=='01'?substring(datum.value,0,4):''\",\"labelAngle\":0,\"ticks\":false,\"grid\":false,\"labelPadding\":8,\"labelFontSize\":11,\"labelColor\":\"#64748B\",\"domainColor\":\"#CBD5E1\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\",\"scale\":{\"reverse\":true},\"axis\":{\"title\":null,\"gridDash\":[3,3],\"gridColor\":\"#E2E8F0\",\"gridOpacity\":0.8,\"labelColor\":\"#64748B\",\"domainColor\":\"#CBD5E1\"}},\"tooltip\":[{\"field\":\"period_label\",\"title\":\"Period\"},{\"field\":\"current_rank\",\"title\":\"Rank\"},{\"field\":\"ranking_points\",\"title\":\"Points\"}]}},{\"transform\":[{\"filter\":\"datum.is_current_week==true\"}],\"mark\":{\"type\":\"point\",\"color\":\"#059669\",\"size\":90,\"filled\":true,\"stroke\":\"white\",\"strokeWidth\":2},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\"}}},{\"transform\":[{\"filter\":\"datum.is_current_week==true\"}],\"mark\":{\"type\":\"text\",\"align\":\"right\",\"dx\":-12,\"dy\":-12,\"fontSize\":11,\"fontWeight\":\"bold\",\"color\":\"#059669\"},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\"},\"text\":{\"field\":\"current_annotation\"}}},{\"transform\":[{\"filter\":\"datum.is_last_ranked==true\"}],\"mark\":{\"type\":\"point\",\"color\":\"#C1121F\",\"size\":90,\"filled\":true,\"stroke\":\"white\",\"strokeWidth\":2},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\"}}},{\"transform\":[{\"filter\":\"datum.is_last_ranked==true\"}],\"mark\":{\"type\":\"text\",\"align\":\"right\",\"dx\":-12,\"dy\":-12,\"fontSize\":11,\"fontWeight\":\"bold\",\"color\":\"#C1121F\"},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\"},\"text\":{\"field\":\"current_annotation\"}}}]}"
+              },
+              "version": 1,
+              "widgetType": "custom-vega-viz",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "period_label"
+                  },
+                  {
+                    "fieldName": "period_key"
+                  },
+                  {
+                    "fieldName": "current_rank"
+                  },
+                  {
+                    "fieldName": "ranking_points"
+                  },
+                  {
+                    "fieldName": "is_current_week"
+                  },
+                  {
+                    "fieldName": "is_last_ranked"
+                  },
+                  {
+                    "fieldName": "current_annotation"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 19,
+            "width": 6,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "trend_doubles_ind",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "trend_doubles_ind",
+                  "fields": [
+                    {
+                      "name": "period_label",
+                      "expression": "`period_label`"
+                    },
+                    {
+                      "name": "period_key",
+                      "expression": "`period_key`"
+                    },
+                    {
+                      "name": "current_rank",
+                      "expression": "`current_rank`"
+                    },
+                    {
+                      "name": "ranking_points",
+                      "expression": "`ranking_points`"
+                    },
+                    {
+                      "name": "is_current_week",
+                      "expression": "`is_current_week`"
+                    },
+                    {
+                      "name": "is_last_ranked",
+                      "expression": "`is_last_ranked`"
+                    },
+                    {
+                      "name": "current_annotation",
+                      "expression": "`current_annotation`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Doubles Individual — Ranking History",
+                  "fields": []
+                }
+              },
+              "jsonSpec": {
+                "type": "vega-lite",
+                "spec": "{\"$schema\":\"https://vega.github.io/schema/vega-lite/v6.json\",\"data\":{\"name\":\"databricks_query\"},\"width\":\"container\",\"height\":\"container\",\"config\":{\"autosize\":{\"type\":\"fit\",\"contains\":\"padding\"},\"view\":{\"stroke\":null},\"background\":\"transparent\",\"font\":\"Inter\"},\"layer\":[{\"mark\":{\"type\":\"line\",\"strokeWidth\":2.5,\"color\":\"#F28E2B\",\"interpolate\":\"monotone\"},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"},\"axis\":{\"title\":null,\"labelExpr\":\"substring(datum.value,6)=='01'?substring(datum.value,0,4):''\",\"labelAngle\":0,\"ticks\":false,\"grid\":false,\"labelPadding\":8,\"labelFontSize\":11,\"labelColor\":\"#64748B\",\"domainColor\":\"#CBD5E1\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\",\"scale\":{\"reverse\":true},\"axis\":{\"title\":null,\"gridDash\":[3,3],\"gridColor\":\"#E2E8F0\",\"gridOpacity\":0.8,\"labelColor\":\"#64748B\",\"domainColor\":\"#CBD5E1\"}},\"tooltip\":[{\"field\":\"period_label\",\"title\":\"Period\"},{\"field\":\"current_rank\",\"title\":\"Rank\"},{\"field\":\"ranking_points\",\"title\":\"Points\"}]}},{\"transform\":[{\"filter\":\"datum.is_current_week==true\"}],\"mark\":{\"type\":\"point\",\"color\":\"#059669\",\"size\":90,\"filled\":true,\"stroke\":\"white\",\"strokeWidth\":2},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\"}}},{\"transform\":[{\"filter\":\"datum.is_current_week==true\"}],\"mark\":{\"type\":\"text\",\"align\":\"right\",\"dx\":-12,\"dy\":-12,\"fontSize\":11,\"fontWeight\":\"bold\",\"color\":\"#059669\"},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\"},\"text\":{\"field\":\"current_annotation\"}}},{\"transform\":[{\"filter\":\"datum.is_last_ranked==true\"}],\"mark\":{\"type\":\"point\",\"color\":\"#C1121F\",\"size\":90,\"filled\":true,\"stroke\":\"white\",\"strokeWidth\":2},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\"}}},{\"transform\":[{\"filter\":\"datum.is_last_ranked==true\"}],\"mark\":{\"type\":\"text\",\"align\":\"right\",\"dx\":-12,\"dy\":-12,\"fontSize\":11,\"fontWeight\":\"bold\",\"color\":\"#C1121F\"},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\"},\"text\":{\"field\":\"current_annotation\"}}}]}"
+              },
+              "version": 1,
+              "widgetType": "custom-vega-viz",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "period_label"
+                  },
+                  {
+                    "fieldName": "period_key"
+                  },
+                  {
+                    "fieldName": "current_rank"
+                  },
+                  {
+                    "fieldName": "ranking_points"
+                  },
+                  {
+                    "fieldName": "is_current_week"
+                  },
+                  {
+                    "fieldName": "is_last_ranked"
+                  },
+                  {
+                    "fieldName": "current_annotation"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 19,
+            "width": 6,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "trend_xd",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "trend_xd",
+                  "fields": [
+                    {
+                      "name": "period_label",
+                      "expression": "`period_label`"
+                    },
+                    {
+                      "name": "period_key",
+                      "expression": "`period_key`"
+                    },
+                    {
+                      "name": "current_rank",
+                      "expression": "`current_rank`"
+                    },
+                    {
+                      "name": "ranking_points",
+                      "expression": "`ranking_points`"
+                    },
+                    {
+                      "name": "is_current_week",
+                      "expression": "`is_current_week`"
+                    },
+                    {
+                      "name": "is_last_ranked",
+                      "expression": "`is_last_ranked`"
+                    },
+                    {
+                      "name": "current_annotation",
+                      "expression": "`current_annotation`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Mixed Doubles — Ranking History",
+                  "fields": []
+                }
+              },
+              "jsonSpec": {
+                "type": "vega-lite",
+                "spec": "{\"$schema\":\"https://vega.github.io/schema/vega-lite/v6.json\",\"data\":{\"name\":\"databricks_query\"},\"width\":\"container\",\"height\":\"container\",\"config\":{\"autosize\":{\"type\":\"fit\",\"contains\":\"padding\"},\"view\":{\"stroke\":null},\"background\":\"transparent\",\"font\":\"Inter\"},\"layer\":[{\"mark\":{\"type\":\"line\",\"strokeWidth\":2.5,\"color\":\"#059669\",\"interpolate\":\"monotone\"},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"},\"axis\":{\"title\":null,\"labelExpr\":\"substring(datum.value,6)=='01'?substring(datum.value,0,4):''\",\"labelAngle\":0,\"ticks\":false,\"grid\":false,\"labelPadding\":8,\"labelFontSize\":11,\"labelColor\":\"#64748B\",\"domainColor\":\"#CBD5E1\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\",\"scale\":{\"reverse\":true},\"axis\":{\"title\":null,\"gridDash\":[3,3],\"gridColor\":\"#E2E8F0\",\"gridOpacity\":0.8,\"labelColor\":\"#64748B\",\"domainColor\":\"#CBD5E1\"}},\"tooltip\":[{\"field\":\"period_label\",\"title\":\"Period\"},{\"field\":\"current_rank\",\"title\":\"Rank\"},{\"field\":\"ranking_points\",\"title\":\"Points\"}]}},{\"transform\":[{\"filter\":\"datum.is_current_week==true\"}],\"mark\":{\"type\":\"point\",\"color\":\"#059669\",\"size\":90,\"filled\":true,\"stroke\":\"white\",\"strokeWidth\":2},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\"}}},{\"transform\":[{\"filter\":\"datum.is_current_week==true\"}],\"mark\":{\"type\":\"text\",\"align\":\"right\",\"dx\":-12,\"dy\":-12,\"fontSize\":11,\"fontWeight\":\"bold\",\"color\":\"#059669\"},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\"},\"text\":{\"field\":\"current_annotation\"}}},{\"transform\":[{\"filter\":\"datum.is_last_ranked==true\"}],\"mark\":{\"type\":\"point\",\"color\":\"#C1121F\",\"size\":90,\"filled\":true,\"stroke\":\"white\",\"strokeWidth\":2},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\"}}},{\"transform\":[{\"filter\":\"datum.is_last_ranked==true\"}],\"mark\":{\"type\":\"text\",\"align\":\"right\",\"dx\":-12,\"dy\":-12,\"fontSize\":11,\"fontWeight\":\"bold\",\"color\":\"#C1121F\"},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\"},\"text\":{\"field\":\"current_annotation\"}}}]}"
+              },
+              "version": 1,
+              "widgetType": "custom-vega-viz",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "period_label"
+                  },
+                  {
+                    "fieldName": "period_key"
+                  },
+                  {
+                    "fieldName": "current_rank"
+                  },
+                  {
+                    "fieldName": "ranking_points"
+                  },
+                  {
+                    "fieldName": "is_current_week"
+                  },
+                  {
+                    "fieldName": "is_last_ranked"
+                  },
+                  {
+                    "fieldName": "current_annotation"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 26,
+            "width": 6,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "trend_xdi",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "trend_xdi",
+                  "fields": [
+                    {
+                      "name": "period_label",
+                      "expression": "`period_label`"
+                    },
+                    {
+                      "name": "period_key",
+                      "expression": "`period_key`"
+                    },
+                    {
+                      "name": "current_rank",
+                      "expression": "`current_rank`"
+                    },
+                    {
+                      "name": "ranking_points",
+                      "expression": "`ranking_points`"
+                    },
+                    {
+                      "name": "is_current_week",
+                      "expression": "`is_current_week`"
+                    },
+                    {
+                      "name": "is_last_ranked",
+                      "expression": "`is_last_ranked`"
+                    },
+                    {
+                      "name": "current_annotation",
+                      "expression": "`current_annotation`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Mixed Doubles Individual — Ranking History",
+                  "fields": []
+                }
+              },
+              "jsonSpec": {
+                "type": "vega-lite",
+                "spec": "{\"$schema\":\"https://vega.github.io/schema/vega-lite/v6.json\",\"data\":{\"name\":\"databricks_query\"},\"width\":\"container\",\"height\":\"container\",\"config\":{\"autosize\":{\"type\":\"fit\",\"contains\":\"padding\"},\"view\":{\"stroke\":null},\"background\":\"transparent\",\"font\":\"Inter\"},\"layer\":[{\"mark\":{\"type\":\"line\",\"strokeWidth\":2.5,\"color\":\"#7C3AED\",\"interpolate\":\"monotone\"},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"},\"axis\":{\"title\":null,\"labelExpr\":\"substring(datum.value,6)=='01'?substring(datum.value,0,4):''\",\"labelAngle\":0,\"ticks\":false,\"grid\":false,\"labelPadding\":8,\"labelFontSize\":11,\"labelColor\":\"#64748B\",\"domainColor\":\"#CBD5E1\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\",\"scale\":{\"reverse\":true},\"axis\":{\"title\":null,\"gridDash\":[3,3],\"gridColor\":\"#E2E8F0\",\"gridOpacity\":0.8,\"labelColor\":\"#64748B\",\"domainColor\":\"#CBD5E1\"}},\"tooltip\":[{\"field\":\"period_label\",\"title\":\"Period\"},{\"field\":\"current_rank\",\"title\":\"Rank\"},{\"field\":\"ranking_points\",\"title\":\"Points\"}]}},{\"transform\":[{\"filter\":\"datum.is_current_week==true\"}],\"mark\":{\"type\":\"point\",\"color\":\"#059669\",\"size\":90,\"filled\":true,\"stroke\":\"white\",\"strokeWidth\":2},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\"}}},{\"transform\":[{\"filter\":\"datum.is_current_week==true\"}],\"mark\":{\"type\":\"text\",\"align\":\"right\",\"dx\":-12,\"dy\":-12,\"fontSize\":11,\"fontWeight\":\"bold\",\"color\":\"#059669\"},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\"},\"text\":{\"field\":\"current_annotation\"}}},{\"transform\":[{\"filter\":\"datum.is_last_ranked==true\"}],\"mark\":{\"type\":\"point\",\"color\":\"#C1121F\",\"size\":90,\"filled\":true,\"stroke\":\"white\",\"strokeWidth\":2},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\"}}},{\"transform\":[{\"filter\":\"datum.is_last_ranked==true\"}],\"mark\":{\"type\":\"text\",\"align\":\"right\",\"dx\":-12,\"dy\":-12,\"fontSize\":11,\"fontWeight\":\"bold\",\"color\":\"#C1121F\"},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\"},\"text\":{\"field\":\"current_annotation\"}}}]}"
+              },
+              "version": 1,
+              "widgetType": "custom-vega-viz",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "period_label"
+                  },
+                  {
+                    "fieldName": "period_key"
+                  },
+                  {
+                    "fieldName": "current_rank"
+                  },
+                  {
+                    "fieldName": "ranking_points"
+                  },
+                  {
+                    "fieldName": "is_current_week"
+                  },
+                  {
+                    "fieldName": "is_last_ranked"
+                  },
+                  {
+                    "fieldName": "current_annotation"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 26,
+            "width": 6,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "player_photo",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "player_cards",
+                  "fields": [
+                    {
+                      "name": "image_html",
+                      "expression": "`image_html`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": false
+              },
+              "version": 2,
+              "displayRowNumbers": false,
+              "rowsPerPage": 1,
+              "headerHeight": 0,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "image_html",
+                    "displayName": " ",
+                    "style": {
+                      "type": "html"
+                    }
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "header_html",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "player_facts",
+                  "fields": [
+                    {
+                      "name": "header_html",
+                      "expression": "`header_html`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": false,
+                "title": {
+                  "value": "Player Header",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "displayRowNumbers": false,
+              "rowsPerPage": 1,
+              "headerHeight": 0,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "header_html",
+                    "displayName": " ",
+                    "style": {
+                      "type": "html",
+                      "highlightLinks": true
+                    }
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 0,
+            "width": 6,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "canvasBackgroundColor": {
+        "light": "#F5F7FA",
+        "dark": "#111827"
+      },
+      "widgetBackgroundColor": {
+        "light": "#FFFFFF",
+        "dark": "#1F2937"
+      },
+      "widgetBorderColor": {
+        "light": "#E5EAF0"
+      },
+      "fontColor": {
+        "light": "#0B1F2A"
+      },
+      "selectionColor": {
+        "light": "#C1121F"
+      },
+      "visualizationColors": [
+        "#C1121F",
+        "#0B1F2A",
+        "#1D4ED8",
+        "#F28E2B",
+        "#059669",
+        "#7C3AED"
+      ],
+      "widgetHeaderAlignment": "LEFT",
+      "fontFamily": "Inter",
+      "textBoxVerticalAlign": "VERTICAL_ALIGN_TOP",
+      "widgetPadding": 16,
+      "widgetMargin": 8,
+      "widgetCornerRadius": 12,
+      "widgetShadow": 10,
+      "continuousGradient": {
+        "lightMode": {
+          "customSequential": {
+            "start": "#F8FAFC",
+            "end": "#C1121F"
+          }
+        }
+      },
+      "fontSettings": {
+        "base": {
+          "fontFamily": "Inter",
+          "fontColor": {
+            "light": "#0B1F2A"
+          },
+          "fontSize": 12
+        },
+        "widgetTitle": {
+          "fontFamily": "Inter",
+          "fontColor": {
+            "light": "#0B1F2A"
+          },
+          "fontSize": 15,
+          "fontWeight": 700
+        },
+        "widgetDescription": {
+          "fontFamily": "Inter",
+          "fontColor": {
+            "light": "#475569",
+            "dark": "#9CA3AF"
+          },
+          "fontSize": 12
+        },
+        "fieldTitle": {
+          "fontFamily": "Inter",
+          "fontColor": {
+            "light": "#475569"
+          },
+          "fontSize": 12,
+          "fontWeight": 600
+        },
+        "fieldValue": {
+          "fontFamily": "Inter",
+          "fontColor": {
+            "light": "#0B1F2A"
+          },
+          "fontSize": 12
+        }
+      },
+      "gridLineColor": {
+        "light": "#E2E8F0"
+      },
+      "axisLineColor": {
+        "light": "#CBD5E1"
+      },
+      "visualizationColorMappings": [
+        {
+          "value": "MS",
+          "color": "#1B9E77"
+        },
+        {
+          "value": "WS",
+          "color": "#D95F02"
+        },
+        {
+          "value": "MD",
+          "color": "#7570B3"
+        },
+        {
+          "value": "MDI",
+          "color": "#E7298A"
+        },
+        {
+          "value": "WD",
+          "color": "#66A61E"
+        },
+        {
+          "value": "WDI",
+          "color": "#E6AB02"
+        },
+        {
+          "value": "XD",
+          "color": "#A6761D"
+        },
+        {
+          "value": "XDI",
+          "color": "#666666"
+        }
+      ]
+    },
+    "applyModeEnabled": false
+  }
+}

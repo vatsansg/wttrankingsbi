@@ -11,17 +11,29 @@
 # MAGIC proportionate to a 20-table bronze layer, not a large
 # MAGIC production pipeline.
 # MAGIC
-# MAGIC **Change (2026-09-12, MainRanking historical backfill exercise):**
-# MAGIC `bronze.ranking_individuals`/`ranking_pairs` now accumulate across
-# MAGIC multiple weeks instead of being replaced each run (see the modified
-# MAGIC `01`/`02` notebooks) -- Check 3 below is new, and shows the distinct
-# MAGIC weeks currently sitting in each, so a run's output makes it obvious
-# MAGIC whether accumulation is behaving as expected. `bronze.
-# MAGIC main_ranking_historical` is checked too, but only informationally, never
-# MAGIC as a hard requirement -- it's populated by a separate, manually-run
-# MAGIC notebook (`10.Ingest Main Ranking Historical`), not by this job, so a
-# MAGIC normal weekly bronze run must not fail just because that table hasn't
-# MAGIC been loaded (or loaded yet) in this workspace.
+# MAGIC **Step 8 additions (2026-09-19):**
+# MAGIC - Check 3's `duplicate_key_checks` list now also covers
+# MAGIC   `ranking_individuals`/`ranking_pairs`, not just `ref_countries` --
+# MAGIC   closes the gap flagged in the `Incremental_Load_Steps_7-11_Plan.docx`
+# MAGIC   review: bronze accumulates via `replaceWhere` now, so a bug in the
+# MAGIC   replace predicate (or a landing file re-published with different
+# MAGIC   content for an already-loaded week) could in principle produce true
+# MAGIC   duplicates that only silver's dedup would quietly absorb.
+# MAGIC - New Check 4: **target-week-landed assertion.** Takes
+# MAGIC   `p_ranking_year`/`p_ranking_week` as widgets (populated via
+# MAGIC   `dbutils.jobs.taskValues` from `01-control/02.Detect New Week` once
+# MAGIC   Step 9 wires this into the scheduled job) and confirms that specific
+# MAGIC   week actually has rows in `ranking_individuals`/`ranking_pairs` --
+# MAGIC   closes the freshness-check gap from the same review: every existing
+# MAGIC   check here passes on total accumulated history, so a run that
+# MAGIC   detected/loaded the wrong week, or silently no-op'd, would otherwise
+# MAGIC   look identical to a healthy run. Skipped (not failed) if the widgets
+# MAGIC   are blank, so this notebook still runs standalone by hand during Step
+# MAGIC   8/9 testing, same as before.
+# MAGIC - On success, stamps `bronze_done` on the matching `batch_control` row
+# MAGIC   (only when the target-week widgets were supplied); on failure, stamps
+# MAGIC   `failed` with `failure_stage='bronze'` instead, so Step 10's freshness
+# MAGIC   check and alerting can tell "never ran" apart from "ran and broke".
 
 # COMMAND ----------
 
@@ -57,6 +69,12 @@ ALL_BRONZE_TABLES = [
     f"{catalog_name}.{bronze_schema}.competitors",
     f"{catalog_name}.{bronze_schema}.players_doubles"
 ]
+
+dbutils.widgets.text("p_ranking_year", "")
+dbutils.widgets.text("p_ranking_week", "")
+v_ranking_year = dbutils.widgets.get("p_ranking_year")
+v_ranking_week = dbutils.widgets.get("p_ranking_week")
+HAVE_TARGET_WEEK = bool(v_ranking_year) and bool(v_ranking_week)
 
 # COMMAND ----------
 
@@ -100,48 +118,111 @@ for full_table_name, key_col in null_key_checks:
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC #### Check 3 (new) - accumulation visibility + optional MainRanking status
-# MAGIC Informational only -- prints the distinct `(RankingYear, RankingWeek)`
-# MAGIC pairs currently in `ranking_individuals`/`ranking_pairs` so a run makes
-# MAGIC it obvious whether the accumulate-write fix is behaving (more than one
-# MAGIC week present after more than one week has been loaded). Also checks
-# MAGIC `main_ranking_historical` if it exists, but never fails this job if it
-# MAGIC doesn't -- see the header note above.
+# MAGIC #### Check 3 - no duplicate business keys on tables a gold dimension
+# MAGIC joins on by that key alone
+# MAGIC **2026-09-13:** `ref_countries.CountryCode` added (expert pre-run review,
+# MAGIC before the `ref_countries` source-table fix was executed) -- a duplicate
+# MAGIC there would silently fan out `gold.dim_country` and every fact joined to
+# MAGIC it, with nothing in Check 1/2 catching it (row counts and null-key checks
+# MAGIC both stay clean on a duplicate non-null key).
+# MAGIC
+# MAGIC **2026-09-19 (Step 8):** `ranking_individuals`/`ranking_pairs` added,
+# MAGIC same reasoning, scoped to their real natural key including
+# MAGIC `(ranking_year, ranking_week)` -- a duplicate here wouldn't fan out a
+# MAGIC gold dimension, but would silently double-count a player/pair for one
+# MAGIC week's numbers, and only silver's `dedup_on_business_key` safety net
+# MAGIC would ever quietly absorb it. Generalizes past `ref_countries` -- any
+# MAGIC table a gold dimension or a per-week rollup depends on a single-row-per-
+# MAGIC key guarantee for belongs in this list.
 
 # COMMAND ----------
 
-for full_table_name in [
-    f"{catalog_name}.{bronze_schema}.ranking_individuals",
-    f"{catalog_name}.{bronze_schema}.ranking_pairs",
-]:
-    weeks_df = (
-        spark.table(full_table_name)
-             .select('RankingYear', 'RankingWeek')
-             .distinct()
-             .orderBy('RankingYear', 'RankingWeek')
-    )
-    week_count = weeks_df.count()
-    print(f"INFO  {full_table_name}: {week_count} distinct (RankingYear, RankingWeek) pair(s) present")
-    display(weeks_df)
+duplicate_key_checks = [
+    (f"{catalog_name}.{bronze_schema}.ref_countries", ["CountryCode"]),
+    (f"{catalog_name}.{bronze_schema}.ranking_individuals",
+     ["IttfId", "SubEventCode", "RankingYear", "RankingWeek", "ranking_run_code"]),
+    (f"{catalog_name}.{bronze_schema}.ranking_pairs",
+     ["PairId", "SubEventCode", "RankingYear", "RankingWeek", "ranking_run_code"]),
+]
 
-main_ranking_table = f"{catalog_name}.{bronze_schema}.main_ranking_historical"
-try:
-    mr_count = spark.table(main_ranking_table).count()
-    mr_null_key = spark.table(main_ranking_table).where(F.col('CompetitorId').isNull()).count()
-    print(f"INFO  {main_ranking_table}: {mr_count} rows, {mr_null_key} null CompetitorId")
-    if mr_count > 0 and mr_null_key > 0:
-        failures.append(f"{main_ranking_table}.CompetitorId has {mr_null_key} null value(s)")
-except Exception:
-    print(f"INFO  {main_ranking_table}: not yet loaded in this workspace (not required by this job)")
+for full_table_name, key_cols in duplicate_key_checks:
+    dup_df = (
+        spark.table(full_table_name)
+            .groupBy(*key_cols)
+            .count()
+            .filter(F.col('count') > 1)
+    )
+    dup_count = dup_df.count()
+    key_label = ", ".join(key_cols)
+    if dup_count > 0:
+        dup_values = [tuple(row[c] for c in key_cols) for row in dup_df.limit(20).collect()]
+        failures.append(
+            f"{full_table_name}.({key_label}) has {dup_count} duplicated key(s), "
+            f"e.g. {dup_values} -- would silently double-count in any downstream rollup"
+        )
+    else:
+        print(f"OK    {full_table_name}.({key_label}): no duplicates")
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC #### Result
+# MAGIC #### Check 4 - target-week-landed assertion (Step 8, freshness check)
+# MAGIC Only runs when `p_ranking_year`/`p_ranking_week` were supplied (blank in
+# MAGIC a standalone manual run -- this check is skipped, not failed, so nothing
+# MAGIC about running this notebook by hand today changes). Once Step 9 wires
+# MAGIC these widgets from `01-control/02.Detect New Week`'s taskValues, this is
+# MAGIC what actually proves the week the orchestrator asked for landed --
+# MAGIC Checks 1-3 above pass identically whether or not this run touched the
+# MAGIC right week at all, since they only ever look at accumulated totals.
+
+# COMMAND ----------
+
+if HAVE_TARGET_WEEK:
+    target_year, target_week = int(v_ranking_year), int(v_ranking_week)
+    for full_table_name in [
+        f"{catalog_name}.{bronze_schema}.ranking_individuals",
+        f"{catalog_name}.{bronze_schema}.ranking_pairs",
+    ]:
+        landed_count = (
+            spark.table(full_table_name)
+                .where((F.col('RankingYear') == target_year) & (F.col('RankingWeek') == target_week))
+                .count()
+        )
+        if landed_count == 0:
+            failures.append(
+                f"{full_table_name}: target week ({target_year}, {target_week}) has 0 rows -- "
+                f"this run did not actually land the week the orchestrator asked for"
+            )
+        else:
+            print(f"OK    {full_table_name}: target week ({target_year}, {target_week}) has {landed_count} row(s)")
+else:
+    print("INFO  p_ranking_year/p_ranking_week not supplied -- skipping Check 4 (standalone run).")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC #### Result + `control.batch_control` status update
+# MAGIC Status is only touched when the target-week widgets were supplied --
+# MAGIC same standalone-run accommodation as Check 4.
 
 # COMMAND ----------
 
 if failures:
+    if HAVE_TARGET_WEEK:
+        spark.sql(f"""
+            UPDATE wttrankingsbi.control.batch_control
+            SET status = 'failed', failed_at = current_timestamp(),
+                failure_stage = 'bronze', failure_message = {chr(39)}{'; '.join(failures)[:4000].replace(chr(39), chr(39)+chr(39))}{chr(39)},
+                updated_at = current_timestamp()
+            WHERE ranking_year = {int(v_ranking_year)} AND ranking_week = {int(v_ranking_week)}
+        """)
     raise ValueError("Bronze validation FAILED:\n" + "\n".join(f"  - {f}" for f in failures))
+
+if HAVE_TARGET_WEEK:
+    spark.sql(f"""
+        UPDATE wttrankingsbi.control.batch_control
+        SET status = 'bronze_done', bronze_done_at = current_timestamp(), updated_at = current_timestamp()
+        WHERE ranking_year = {int(v_ranking_year)} AND ranking_week = {int(v_ranking_week)}
+    """)
 
 print(f"Bronze validation passed: {len(ALL_BRONZE_TABLES)} tables checked.")

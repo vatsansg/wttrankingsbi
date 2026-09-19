@@ -20,6 +20,19 @@
 # MAGIC 3. Add Metadata Columns
 # MAGIC 4. Write to bronze delta table (full overwrite)
 # MAGIC 5. Validate row count
+# MAGIC
+# MAGIC **BUGFIX (2026-09-13, caught by expert pre-run review before the
+# MAGIC `ref_countries` source-table fix was ever executed):** the write below
+# MAGIC was missing `.option('overwriteSchema', 'true')` -- present on every
+# MAGIC equivalent silver/gold write in this project, but never added here since
+# MAGIC no registry entry had ever actually changed a table's column set until
+# MAGIC now. `ref_countries`'s registry entry just changed from 13 columns
+# MAGIC (`ContinentId` as int) to 8 (`ContinentId` as string) -- without this
+# MAGIC option, Delta rejects that write outright (`overwrite` alone still
+# MAGIC enforces the EXISTING table's schema), which would have failed the
+# MAGIC for-each task the moment anyone tried to run it. Added proactively for
+# MAGIC every table this generic notebook serves, not just `ref_countries`, since
+# MAGIC the same risk exists for any future registry column-list change.
 
 # COMMAND ----------
 
@@ -35,7 +48,7 @@
 
 # COMMAND ----------
 
-dbutils.widgets.text("p_table_key", "ref_countries")
+dbutils.widgets.text("p_table_key", "")
 v_table_key = dbutils.widgets.get("p_table_key")
 
 if v_table_key not in REFERENCE_TABLES:
@@ -80,6 +93,7 @@ display(reference_final_df)
         .write
         .format('delta')
         .mode('overwrite')
+        .option('overwriteSchema', 'true')
         .saveAsTable(table_name)
 )
 

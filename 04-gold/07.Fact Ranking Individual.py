@@ -75,11 +75,19 @@ display(fact_ranking_individual_df)
 # MAGIC %md
 # MAGIC #### Step 2 - Write to gold delta table
 # MAGIC Full overwrite, same one-off track as bronze/silver -- see the Step 3
-# MAGIC README's "Full overwrite, not merge/upsert" note. This means, today,
-# MAGIC this fact only ever holds ONE ranking week's worth of rows at a time
-# MAGIC (whatever `silver.ranking_individuals` currently has) -- see
-# MAGIC `04.Build Dim Ranking Week`'s note on why that table's row count won't
-# MAGIC match this one until the incremental production track (Step 7+).
+# MAGIC README's "Full overwrite, not merge/upsert" note.
+# MAGIC
+# MAGIC **Comment corrected 2026-09-19 (Step 8) -- this used to say this fact
+# MAGIC "only ever holds ONE ranking week's worth of rows at a time" until the
+# MAGIC incremental production track started. That's stale: since the
+# MAGIC MainRanking historical backfill and the Step 2b accumulate-write fix,
+# MAGIC `silver.ranking_individuals` (and so this table, on every full-overwrite
+# MAGIC rebuild) already holds ~6 years of weekly history -- see `09.Gold
+# MAGIC Dashboard Views.py`'s own corrected note, which is what this comment
+# MAGIC should have matched all along.** Do not use this table's row count as a
+# MAGIC freshness signal for "did this week's data land" -- it's always large
+# MAGIC and non-empty regardless. `10.Validate All Gold Tables.py`'s Step 8
+# MAGIC target-week-landed assertion is what actually checks that.
 
 # COMMAND ----------
 
