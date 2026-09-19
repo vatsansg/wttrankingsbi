@@ -1667,6 +1667,66 @@
           }
         }
       ]
+    },
+    {
+      "name": "6ef701f4",
+      "displayName": "ds_gold_freshness",
+      "queryLines": [
+        "SELECT\n",
+        "  ranking_year,\n",
+        "  ranking_week,\n",
+        "  updated_at,\n",
+        "  CONCAT('Week ', ranking_week, ', ', ranking_year) AS week_label,\n",
+        "  ROUND(\n",
+        "    (unix_timestamp(current_timestamp()) - unix_timestamp(updated_at)) / 3600.0,\n",
+        "    1\n",
+        "  ) AS hours_ago,\n",
+        "  total_minutes,\n",
+        "  TRIM(\n",
+        "    CONCAT(\n",
+        "      CASE\n",
+        "        WHEN\n",
+        "          FLOOR(total_minutes / 1440) >= 1\n",
+        "        THEN\n",
+        "          CONCAT(\n",
+        "            CAST(FLOOR(total_minutes / 1440) AS STRING),\n",
+        "            CASE\n",
+        "              WHEN FLOOR(total_minutes / 1440) = 1 THEN ' day '\n",
+        "              ELSE ' days '\n",
+        "            END\n",
+        "          )\n",
+        "        ELSE ''\n",
+        "      END,\n",
+        "      CASE\n",
+        "        WHEN\n",
+        "          FLOOR((total_minutes % 1440) / 60) >= 1\n",
+        "        THEN\n",
+        "          CONCAT(CAST(FLOOR((total_minutes % 1440) / 60) AS STRING), 'hrs ')\n",
+        "        ELSE ''\n",
+        "      END,\n",
+        "      CASE\n",
+        "        WHEN (total_minutes % 60) >= 1 THEN CONCAT(CAST(total_minutes % 60 AS STRING), 'min')\n",
+        "        ELSE ''\n",
+        "      END\n",
+        "    )\n",
+        "  ) AS duration_label\n",
+        "FROM\n",
+        "  (\n",
+        "    SELECT\n",
+        "      *,\n",
+        "      CAST(\n",
+        "        FLOOR((unix_timestamp(current_timestamp()) - unix_timestamp(updated_at)) / 60.0) AS INT\n",
+        "      ) AS total_minutes\n",
+        "    FROM\n",
+        "      wttrankingsbi.control.batch_control\n",
+        "    WHERE\n",
+        "      status = 'gold_done'\n",
+        "    ORDER BY\n",
+        "      ranking_year DESC,\n",
+        "      ranking_week DESC\n",
+        "    LIMIT 1\n",
+        "  )"
+      ]
     }
   ],
   "pages": [
@@ -2338,7 +2398,7 @@
             }
           },
           "position": {
-            "x": 8,
+            "x": 6,
             "y": 2,
             "width": 2,
             "height": 2
@@ -2392,7 +2452,7 @@
             }
           },
           "position": {
-            "x": 6,
+            "x": 8,
             "y": 2,
             "width": 2,
             "height": 2
@@ -2412,7 +2472,7 @@
           "position": {
             "x": 0,
             "y": 0,
-            "width": 12,
+            "width": 8,
             "height": 2
           }
         },
@@ -2646,7 +2706,7 @@
           },
           "position": {
             "x": 6,
-            "y": 4,
+            "y": 6,
             "width": 6,
             "height": 8
           }
@@ -2931,7 +2991,7 @@
           },
           "position": {
             "x": 6,
-            "y": 12,
+            "y": 14,
             "width": 6,
             "height": 7
           }
@@ -3085,7 +3145,7 @@
           },
           "position": {
             "x": 4,
-            "y": 19,
+            "y": 21,
             "width": 4,
             "height": 5
           }
@@ -3148,9 +3208,117 @@
           },
           "position": {
             "x": 8,
-            "y": 19,
+            "y": 21,
             "width": 4,
             "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "9abfcb91",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "6ef701f4",
+                  "fields": [
+                    {
+                      "name": "hours_ago",
+                      "expression": "`hours_ago`"
+                    },
+                    {
+                      "name": "duration_label",
+                      "expression": "`duration_label`"
+                    },
+                    {
+                      "name": "ranking_week",
+                      "expression": "`ranking_week`"
+                    },
+                    {
+                      "name": "ranking_year",
+                      "expression": "`ranking_year`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "showDescription": false,
+                "contentAlignment": "center",
+                "title": {
+                  "value": "Data Freshness",
+                  "fields": []
+                },
+                "description": {
+                  "value": "Green ≤168h | Amber 168–192h | Red >192h",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "hours_ago",
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "none",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 1
+                    }
+                  },
+                  "style": {
+                    "fontWeight": 700,
+                    "fontSize": 16,
+                    "rules": [
+                      {
+                        "condition": {
+                          "operand": {
+                            "type": "data-value",
+                            "value": "168"
+                          },
+                          "operator": "<="
+                        },
+                        "fontColor": "#16A34A"
+                      },
+                      {
+                        "condition": {
+                          "operand": {
+                            "type": "data-value",
+                            "value": "192"
+                          },
+                          "operator": ">"
+                        },
+                        "fontColor": "#DC2626"
+                      },
+                      {
+                        "condition": {
+                          "operand": {
+                            "type": "data-value",
+                            "value": "168"
+                          },
+                          "operator": ">"
+                        },
+                        "fontColor": "#D97706"
+                      }
+                    ]
+                  },
+                  "formatTemplate": "{{ duration_label }} ago — Week {{ ranking_week }}, {{ ranking_year }}"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 0,
+            "width": 4,
+            "height": 2
           }
         }
       ],

@@ -13,14 +13,17 @@
 # and tested, pause or delete the three old jobs so they don't double-run
 # the same week.
 #
-# ASSUMPTIONS TO VERIFY BEFORE IMPORTING -- fix these two paths first if
-# they don't match your workspace:
-#   1. All notebook paths below assume the standard workspace root:
+# NOTEBOOK PATHS -- confirmed against the live workspace 2026-09-19 (the
+# wttrankingsbi_step8.dbc export taken after a real week-33 run through this
+# job):
+#   1. All notebook paths below use the standard workspace root:
 #      /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi
-#   2. `detect_new_week`'s notebook_path assumes you imported
-#      `01-control/02.Detect New Week.py` to
-#      `02-bronze/00.Detect New Week` (the README's suggested path). If you
-#      put it somewhere else, update that one notebook_path below.
+#   2. `detect_new_week`'s notebook_path is
+#      `01-control/00.Detect New Week` -- this is where it actually lives in
+#      the live workspace (corrected from an earlier draft of this file,
+#      which had assumed `02-bronze/00.Detect New Week`; the live job import
+#      already used the correct path, so this was a deliverable-only fix,
+#      not a live-system one).
 # Databricks does not validate notebook_path at save time, only that the
 # YAML is well-formed -- a stale path surfaces later as a single failed
 # task, not an upfront error.
@@ -57,6 +60,16 @@ resources:
         quartz_cron_expression: "0 0 6 ? * TUE"
         timezone_id: Asia/Singapore
         pause_status: UNPAUSED
+      # Step 10 -- job-level failure notification (2026-09-19). Fires once
+      # per run on ANY task failure (bronze/silver/gold/validate), not just
+      # the last task -- Databricks sends one email per failed run, not one
+      # per failed task. `vatsan@worldtabletennis.com` is the placeholder
+      # decided in Next_Steps_and_API_Guide.md 2026-09-15 -- swap for the
+      # real distribution list when one exists, here and in the freshness
+      # job below.
+      email_notifications:
+        on_failure:
+          - vatsan@worldtabletennis.com
       job_clusters:
       - job_cluster_key: wtt_pipeline_job_cluster
         new_cluster:
@@ -74,9 +87,8 @@ resources:
       - task_key: detect_new_week
         job_cluster_key: wtt_pipeline_job_cluster
         notebook_task:
-          # Verify this matches where you actually imported
-          # 01-control/02.Detect New Week.py -- see the header note above.
-          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/02-bronze/00.Detect New Week
+          # Confirmed against the live workspace 2026-09-19 -- see header note.
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/01-control/00.Detect New Week
         max_retries: 1
         min_retry_interval_millis: 60000
         retry_on_timeout: true

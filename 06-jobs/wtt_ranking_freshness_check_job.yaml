@@ -1,0 +1,65 @@
+# WTT Rankings BI -- Step 10 freshness check job
+# Databricks Asset Bundle job-resource YAML -- paste into Databricks Jobs
+# UI's "Edit as YAML" editor to create the job.
+#
+# DELIBERATELY A SEPARATE JOB from wtt_ranking_unified_pipeline, on its own
+# DAILY schedule, not a task tacked onto the end of the weekly pipeline.
+# The whole point of a freshness check is to catch the pipeline job not
+# running at all (schedule paused, deleted, workspace issue) -- a check that
+# only runs as part of the job it's checking can never fire in that exact
+# scenario. Running daily also means a missed/late week gets flagged the day
+# after it should have landed, not up to a further week later.
+#
+# Notebook path assumes you import `05-monitoring/01.Check Gold Freshness.py`
+# to the standard workspace root:
+#   /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/05-monitoring/01.Check Gold Freshness
+# Update the path below if you put it somewhere else.
+
+resources:
+  jobs:
+    wtt_ranking_freshness_check:
+      name: wtt_ranking_freshness_check
+      queue:
+        enabled: true
+      max_concurrent_runs: 1
+      schedule:
+        # Daily, 07:00 Asia/Singapore -- one hour after the pipeline's own
+        # Tuesday 06:00 SGT trigger, so a normal Tuesday run has already
+        # finished by the time this checks it; every other day it's just
+        # re-confirming gold is still within the staleness threshold.
+        quartz_cron_expression: "0 0 7 * * ?"
+        timezone_id: Asia/Singapore
+        pause_status: UNPAUSED
+      # Step 10 -- same placeholder recipient as the pipeline job's
+      # on_failure notification; swap both together when the real
+      # distribution list is decided (see Next_Steps_and_API_Guide.md).
+      email_notifications:
+        on_failure:
+          - vatsan@worldtabletennis.com
+      job_clusters:
+      - job_cluster_key: wtt_freshness_job_cluster
+        new_cluster:
+          spark_version: 15.4.x-scala2.12
+          node_type_id: Standard_DS3_v2
+          num_workers: 0
+          # Single-node cluster -- this job only runs three small aggregate
+          # queries against control.batch_control and
+          # gold.fact_ranking_individual, nowhere near enough work to
+          # justify a worker node. Cheapest possible cluster shape that can
+          # still run a notebook task.
+          spark_conf:
+            spark.databricks.cluster.profile: singleNode
+            spark.master: "local[*]"
+          custom_tags:
+            ResourceClass: SingleNode
+          data_security_mode: SINGLE_USER
+      tasks:
+      - task_key: check_gold_freshness
+        job_cluster_key: wtt_freshness_job_cluster
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/05-monitoring/01.Check Gold Freshness
+        max_retries: 0
+        # No retries here (unlike the pipeline job's tasks) -- a freshness
+        # check that's genuinely stale/stuck/inconsistent won't stop being
+        # so a minute later, and retrying just delays the alert email.
+        timeout_seconds: 600
