@@ -1,8 +1,4 @@
 # Databricks notebook source
-# /// script
-# [tool.databricks.environment]
-# environment_version = "5"
-# ///
 # MAGIC %md
 # MAGIC # Detect New Week
 # MAGIC Step 8's orchestration entry point. Scans the landing volume for a
@@ -97,7 +93,12 @@ new_weeks = [w for w in candidate_weeks if w not in already_known]
 
 if not new_weeks:
     print("INFO  No new week found -- nothing in the landing volume is unprocessed. Exiting cleanly (not a failure).")
-    dbutils.jobs.taskValues.set(key="found", value=False)
+    # Step 9 note: set as the literal string 'false', not a Python bool -- the
+    # job's check_new_week_found condition_task compares this taskValue
+    # against the string 'true' via {{tasks.detect_new_week.values.found}},
+    # and Databricks' bool-to-string serialization for taskValues isn't
+    # documented, so an explicit string constant avoids relying on it.
+    dbutils.jobs.taskValues.set(key="found", value="false")
     dbutils.notebook.exit("no_new_week")
 
 target_year, target_week = new_weeks[0]
@@ -116,7 +117,7 @@ spark.sql(f"""
 
 print(f"INFO  New week detected and recorded: ({target_year}, {target_week})")
 
-dbutils.jobs.taskValues.set(key="found", value=True)
+dbutils.jobs.taskValues.set(key="found", value="true")
 dbutils.jobs.taskValues.set(key="ranking_year", value=str(target_year))
 dbutils.jobs.taskValues.set(key="ranking_week", value=str(target_week))
 

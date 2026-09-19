@@ -1,0 +1,418 @@
+# WTT Rankings BI -- Step 9 unified orchestration job
+# Databricks Asset Bundle job-resource YAML (same schema as `databricks.yml`
+# resources.jobs.<key>) -- paste this whole file into the Databricks Jobs
+# UI's "Edit as YAML" editor to create the job.
+#
+# This REPLACES the three separate jobs from Steps 2-4
+# (wtt_ranking_bronze_ingestion, wtt_ranking_silver_transformation,
+# wtt_ranking_gold_star_schema) with one scheduled job that chains
+# detect -> bronze -> validate -> silver -> validate -> gold -> validate,
+# using dbutils.jobs.taskValues (set by detect_new_week, read via
+# {{tasks.<key>.values.<key>}}) instead of the old manual
+# {{job.parameters.ranking_year}} job-level parameters. Once this is created
+# and tested, pause or delete the three old jobs so they don't double-run
+# the same week.
+#
+# ASSUMPTIONS TO VERIFY BEFORE IMPORTING -- fix these two paths first if
+# they don't match your workspace:
+#   1. All notebook paths below assume the standard workspace root:
+#      /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi
+#   2. `detect_new_week`'s notebook_path assumes you imported
+#      `01-control/02.Detect New Week.py` to
+#      `02-bronze/00.Detect New Week` (the README's suggested path). If you
+#      put it somewhere else, update that one notebook_path below.
+# Databricks does not validate notebook_path at save time, only that the
+# YAML is well-formed -- a stale path surfaces later as a single failed
+# task, not an upfront error.
+#
+# DESIGN DECISION -- everything is gated on "new week found":
+# check_new_week_found is a condition_task that branches on
+# detect_new_week's `found` taskValue. Every bronze/silver/gold task
+# (including the JDBC reference-table refreshes that don't themselves need
+# a specific week) depends on it with outcome: "true", so a run where
+# nothing new landed does nothing but detect and stop -- no wasted cluster
+# time, and it matches how these jobs have only ever been run by hand so
+# far (only run bronze/silver/gold when there's actually a new week).
+# If you'd rather have the JDBC reference-table refreshes
+# (ingest_players_events_results_master*, ingest_individuals_event_penalties,
+# ingest_reference_and_player_tables) run every scheduled tick regardless of
+# whether a new ranking week showed up, remove their dependency on
+# check_new_week_found and point them at detect_new_week directly instead --
+# see the note on those tasks below.
+#
+# All three validate notebooks (bronze's patched 09, silver's patched 07,
+# gold's patched 10) now get p_ranking_year/p_ranking_week from
+# detect_new_week's taskValues -- without these, their Step 8 freshness
+# check (Check 4/4/5) and control.batch_control status update silently
+# no-op, same as running them standalone.
+
+resources:
+  jobs:
+    wtt_ranking_unified_pipeline:
+      name: wtt_ranking_unified_pipeline
+      queue:
+        enabled: true
+      max_concurrent_runs: 1
+      schedule:
+        quartz_cron_expression: "0 0 6 ? * TUE"
+        timezone_id: Asia/Singapore
+        pause_status: UNPAUSED
+      job_clusters:
+      - job_cluster_key: wtt_pipeline_job_cluster
+        new_cluster:
+          spark_version: 15.4.x-scala2.12
+          node_type_id: Standard_DS3_v2
+          num_workers: 1
+          autoscale:
+            min_workers: 1
+            max_workers: 2
+          data_security_mode: SINGLE_USER
+
+      tasks:
+
+      # ---- Entry point ----------------------------------------------------
+      - task_key: detect_new_week
+        job_cluster_key: wtt_pipeline_job_cluster
+        notebook_task:
+          # Verify this matches where you actually imported
+          # 01-control/02.Detect New Week.py -- see the header note above.
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/02-bronze/00.Detect New Week
+        max_retries: 1
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+
+      - task_key: check_new_week_found
+        depends_on:
+        - task_key: detect_new_week
+        condition_task:
+          op: EQUAL_TO
+          left: '{{tasks.detect_new_week.values.found}}'
+          right: 'true'
+
+      # ---- Bronze -----------------------------------------------------------
+      - task_key: ingest_ranking_individuals
+        job_cluster_key: wtt_pipeline_job_cluster
+        depends_on:
+        - task_key: check_new_week_found
+          outcome: "true"
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/02-bronze/01.Ingest Ranking Individuals Files
+          base_parameters:
+            p_ranking_year: '{{tasks.detect_new_week.values.ranking_year}}'
+            p_ranking_week: '{{tasks.detect_new_week.values.ranking_week}}'
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: ingest_ranking_pairs
+        job_cluster_key: wtt_pipeline_job_cluster
+        depends_on:
+        - task_key: check_new_week_found
+          outcome: "true"
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/02-bronze/02.Ingest Ranking Pairs Files
+          base_parameters:
+            p_ranking_year: '{{tasks.detect_new_week.values.ranking_year}}'
+            p_ranking_week: '{{tasks.detect_new_week.values.ranking_week}}'
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      # The four tasks below (JDBC full-refresh ingests + the reference-table
+      # for_each) don't use p_ranking_year/p_ranking_week -- they're gated on
+      # check_new_week_found purely per the design decision in the header
+      # note above, not because they need the specific week. To un-gate
+      # them, change their depends_on to `task_key: detect_new_week` (no
+      # outcome filter) instead.
+      - task_key: ingest_players_events_results_master
+        job_cluster_key: wtt_pipeline_job_cluster
+        depends_on:
+        - task_key: check_new_week_found
+          outcome: "true"
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/02-bronze/03.Ingest Players Events Results Master
+          base_parameters: {}
+        libraries:
+        - maven:
+            coordinates: com.microsoft.sqlserver:mssql-jdbc:12.6.1.jre11
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: ingest_players_events_results_master_log
+        job_cluster_key: wtt_pipeline_job_cluster
+        depends_on:
+        - task_key: check_new_week_found
+          outcome: "true"
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/02-bronze/04.Ingest Players Events Results Master Log
+          base_parameters: {}
+        libraries:
+        - maven:
+            coordinates: com.microsoft.sqlserver:mssql-jdbc:12.6.1.jre11
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: ingest_players_events_results_master_log_archives
+        job_cluster_key: wtt_pipeline_job_cluster
+        depends_on:
+        - task_key: check_new_week_found
+          outcome: "true"
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/02-bronze/05.Ingest Players Events Results Master Log Archives
+          base_parameters: {}
+        libraries:
+        - maven:
+            coordinates: com.microsoft.sqlserver:mssql-jdbc:12.6.1.jre11
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: ingest_individuals_event_penalties
+        job_cluster_key: wtt_pipeline_job_cluster
+        depends_on:
+        - task_key: check_new_week_found
+          outcome: "true"
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/02-bronze/06.Ingest Individuals Event Penalties
+          base_parameters: {}
+        libraries:
+        - maven:
+            coordinates: com.microsoft.sqlserver:mssql-jdbc:12.6.1.jre11
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: ingest_reference_and_player_tables
+        depends_on:
+        - task_key: check_new_week_found
+          outcome: "true"
+        for_each_task:
+          inputs: '["ref_countries", "ref_continents", "ref_age_categories", "ref_categories", "ref_ranking_categories", "ref_subevent_types", "ref_subevents_codes", "ref_subevents_codes_description", "ref_subevent_dependent_categories", "ref_organization", "ref_event_type_general", "ref_result_position", "competitors", "players_doubles"]'
+          concurrency: 6
+          task:
+            task_key: ingest_reference_and_player_tables_iteration
+            job_cluster_key: wtt_pipeline_job_cluster
+            notebook_task:
+              notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/02-bronze/07.Ingest Reference Table (Generic)
+              base_parameters:
+                p_table_key: '{{input}}'
+            libraries:
+            - maven:
+                coordinates: com.microsoft.sqlserver:mssql-jdbc:12.6.1.jre11
+            max_retries: 2
+            min_retry_interval_millis: 60000
+            retry_on_timeout: true
+      - task_key: validate_all_bronze_tables
+        job_cluster_key: wtt_pipeline_job_cluster
+        depends_on:
+        - task_key: ingest_ranking_individuals
+        - task_key: ingest_ranking_pairs
+        - task_key: ingest_players_events_results_master
+        - task_key: ingest_players_events_results_master_log
+        - task_key: ingest_players_events_results_master_log_archives
+        - task_key: ingest_individuals_event_penalties
+        - task_key: ingest_reference_and_player_tables
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/02-bronze/09.Validate All Bronze Tables
+          base_parameters:
+            p_ranking_year: '{{tasks.detect_new_week.values.ranking_year}}'
+            p_ranking_week: '{{tasks.detect_new_week.values.ranking_week}}'
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+
+      # ---- Silver -------------------------------------------------------
+      - task_key: build_player_identity_dimension
+        job_cluster_key: wtt_pipeline_job_cluster
+        depends_on:
+        - task_key: validate_all_bronze_tables
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/03-silver/01.Build Player Identity Dimension
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: silver_ranking_individuals
+        job_cluster_key: wtt_pipeline_job_cluster
+        depends_on:
+        - task_key: build_player_identity_dimension
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/03-silver/02.Silver Ranking Individuals
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: silver_ranking_pairs
+        job_cluster_key: wtt_pipeline_job_cluster
+        depends_on:
+        - task_key: build_player_identity_dimension
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/03-silver/03.Silver Ranking Pairs
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: silver_points_ledger
+        job_cluster_key: wtt_pipeline_job_cluster
+        depends_on:
+        - task_key: build_player_identity_dimension
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/03-silver/04.Silver Points Ledger
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: silver_individuals_event_penalties
+        job_cluster_key: wtt_pipeline_job_cluster
+        depends_on:
+        - task_key: build_player_identity_dimension
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/03-silver/05.Silver Individuals Event Penalties
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: silver_reference_tables
+        depends_on:
+        - task_key: validate_all_bronze_tables
+        for_each_task:
+          inputs: '["ref_countries", "ref_continents", "ref_age_categories", "ref_categories", "ref_ranking_categories", "ref_subevent_types", "ref_subevents_codes", "ref_subevents_codes_description", "ref_subevent_dependent_categories", "ref_organization", "ref_event_type_general", "ref_result_position"]'
+          concurrency: 6
+          task:
+            task_key: silver_reference_tables_iteration
+            job_cluster_key: wtt_pipeline_job_cluster
+            notebook_task:
+              notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/03-silver/06.Silver Reference Table (Generic)
+              base_parameters:
+                p_table_key: '{{input}}'
+            max_retries: 2
+            min_retry_interval_millis: 60000
+            retry_on_timeout: true
+      - task_key: validate_all_silver_tables
+        job_cluster_key: wtt_pipeline_job_cluster
+        depends_on:
+        - task_key: silver_ranking_individuals
+        - task_key: silver_ranking_pairs
+        - task_key: silver_points_ledger
+        - task_key: silver_individuals_event_penalties
+        - task_key: silver_reference_tables
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/03-silver/07.Validate All Silver Tables
+          base_parameters:
+            p_ranking_year: '{{tasks.detect_new_week.values.ranking_year}}'
+            p_ranking_week: '{{tasks.detect_new_week.values.ranking_week}}'
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+
+      # ---- Gold -----------------------------------------------------------
+      # dim_country/subevent/age_category/ranking_week and both facts are
+      # gold's "root" tasks -- the original Step 4 job left them with no
+      # depends_on because that job only ever ran after silver had finished
+      # manually. Now that everything's one job, each needs an explicit
+      # dependency on validate_all_silver_tables to enforce that ordering.
+      - task_key: dim_country
+        job_cluster_key: wtt_pipeline_job_cluster
+        depends_on:
+        - task_key: validate_all_silver_tables
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/04-gold/01.Build Dim Country
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: dim_subevent
+        job_cluster_key: wtt_pipeline_job_cluster
+        depends_on:
+        - task_key: validate_all_silver_tables
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/04-gold/02.Build Dim Subevent
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: dim_age_category
+        job_cluster_key: wtt_pipeline_job_cluster
+        depends_on:
+        - task_key: validate_all_silver_tables
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/04-gold/03.Build Dim Age Category
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: dim_ranking_week
+        job_cluster_key: wtt_pipeline_job_cluster
+        depends_on:
+        - task_key: validate_all_silver_tables
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/04-gold/04.Build Dim Ranking Week
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: dim_player
+        job_cluster_key: wtt_pipeline_job_cluster
+        depends_on:
+        - task_key: dim_country
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/04-gold/05.Build Dim Player
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: dim_pair
+        job_cluster_key: wtt_pipeline_job_cluster
+        depends_on:
+        - task_key: dim_player
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/04-gold/06.Build Dim Pair
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: fact_ranking_individual
+        job_cluster_key: wtt_pipeline_job_cluster
+        depends_on:
+        - task_key: validate_all_silver_tables
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/04-gold/07.Fact Ranking Individual
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: fact_ranking_pair
+        job_cluster_key: wtt_pipeline_job_cluster
+        depends_on:
+        - task_key: validate_all_silver_tables
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/04-gold/08.Fact Ranking Pair
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: gold_dashboard_views
+        job_cluster_key: wtt_pipeline_job_cluster
+        depends_on:
+        - task_key: dim_country
+        - task_key: dim_subevent
+        - task_key: dim_age_category
+        - task_key: dim_player
+        - task_key: dim_pair
+        - task_key: fact_ranking_individual
+        - task_key: fact_ranking_pair
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/04-gold/09.Gold Dashboard Views
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: gold_longitudinal_views
+        job_cluster_key: wtt_pipeline_job_cluster
+        depends_on:
+        - task_key: dim_country
+        - task_key: dim_player
+        - task_key: dim_pair
+        - task_key: fact_ranking_individual
+        - task_key: fact_ranking_pair
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/04-gold/11.Gold Longitudinal Views
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
+      - task_key: validate_all_gold_tables
+        job_cluster_key: wtt_pipeline_job_cluster
+        depends_on:
+        - task_key: gold_dashboard_views
+        - task_key: gold_longitudinal_views
+        - task_key: dim_ranking_week
+        notebook_task:
+          notebook_path: /Workspace/Users/vatsan@worldtabletennis.com/wttrankingsbi/04-gold/10.Validate All Gold Tables
+          base_parameters:
+            p_ranking_year: '{{tasks.detect_new_week.values.ranking_year}}'
+            p_ranking_week: '{{tasks.detect_new_week.values.ranking_week}}'
+        max_retries: 2
+        min_retry_interval_millis: 60000
+        retry_on_timeout: true
