@@ -1709,7 +1709,8 @@
         "        ELSE ''\n",
         "      END\n",
         "    )\n",
-        "  ) AS duration_label\n",
+        "  ) AS duration_label,\n",
+        "  DATE_FORMAT(from_utc_timestamp(updated_at, 'Asia/Singapore'), 'MMM d, yyyy h:mm a') AS updated_at_label\n",
         "FROM\n",
         "  (\n",
         "    SELECT\n",
@@ -3223,12 +3224,16 @@
                   "datasetName": "6ef701f4",
                   "fields": [
                     {
+                      "name": "week_label",
+                      "expression": "`week_label`"
+                    },
+                    {
                       "name": "hours_ago",
                       "expression": "`hours_ago`"
                     },
                     {
-                      "name": "duration_label",
-                      "expression": "`duration_label`"
+                      "name": "updated_at_label",
+                      "expression": "`updated_at_label`"
                     },
                     {
                       "name": "ranking_week",
@@ -3239,7 +3244,13 @@
                       "expression": "`ranking_year`"
                     }
                   ],
-                  "disaggregated": true
+                  "disaggregated": true,
+                  "orders": [
+                    {
+                      "direction": "DESC",
+                      "expression": "`week_label`"
+                    }
+                  ]
                 }
               }
             ],
@@ -3253,7 +3264,7 @@
                   "fields": []
                 },
                 "description": {
-                  "value": "Green ≤168h | Amber 168–192h | Red >192h",
+                  "value": "",
                   "fields": []
                 }
               },
@@ -3272,7 +3283,7 @@
                   },
                   "style": {
                     "fontWeight": 700,
-                    "fontSize": 16,
+                    "fontSize": 10,
                     "rules": [
                       {
                         "condition": {
@@ -3306,7 +3317,11 @@
                       }
                     ]
                   },
-                  "formatTemplate": "{{ duration_label }} ago — Week {{ ranking_week }}, {{ ranking_year }}"
+                  "formatTemplate": "{{ updated_at_label }} SGT · Wk {{ ranking_week }}, {{ ranking_year }}"
+                },
+                "period": {
+                  "fieldName": "week_label",
+                  "hideLabels": true
                 }
               },
               "data": {
