@@ -466,14 +466,14 @@
         "  subevent_code,\n",
         "  previous_rank,\n",
         "  current_rank,\n",
-        "  ranking_difference\n",
+        "  previous_rank - current_rank AS ranking_difference\n",
         "FROM\n",
         "  wttrankingsbi.gold.v_ranking_movers\n",
         "WHERE\n",
         "  ranking_run_code = 'SEN'\n",
-        "  AND ranking_difference > 0\n",
+        "  AND previous_rank - current_rank > 0\n",
         "ORDER BY\n",
-        "  ranking_difference DESC\n",
+        "  previous_rank - current_rank DESC\n",
         "LIMIT 10"
       ]
     },
@@ -1727,6 +1727,502 @@
         "      ranking_week DESC\n",
         "    LIMIT 1\n",
         "  )"
+      ]
+    },
+    {
+      "name": "pair_options",
+      "displayName": "Pair Options",
+      "queryLines": [
+        "-- Labels carry a sortable prefix so the drop-down reads in rank order even if the\n",
+        "-- filter sorts values alphabetically: '#00000' = auto (current #1), '#00007' = ranked 7th\n",
+        "-- this week, '~' = not ranked this week. Selection only reads the trailing '(<id>)'.\n",
+        "SELECT display_label, subevent_label, subevent_code, sort_order\n",
+        "FROM (\n",
+        "  SELECT DISTINCT\n",
+        "    '#00000 · Top-ranked pair (auto)' AS display_label,\n",
+        "    subevent_label,\n",
+        "    subevent_code,\n",
+        "    0 AS sort_order\n",
+        "  FROM wttrankingsbi.gold.v_pair_profile\n",
+        "  WHERE ranking_run_code = 'SEN'\n",
+        "  UNION ALL\n",
+        "  SELECT\n",
+        "    CASE\n",
+        "      WHEN current_rank IS NOT NULL THEN CONCAT('#', LPAD(CAST(current_rank AS STRING), 5, '0'), ' · ', display_label)\n",
+        "      ELSE CONCAT('~ ', display_label)\n",
+        "    END AS display_label,\n",
+        "    subevent_label,\n",
+        "    subevent_code,\n",
+        "    sort_order\n",
+        "  FROM wttrankingsbi.gold.v_pair_profile\n",
+        "  WHERE ranking_run_code = 'SEN'\n",
+        ") t\n",
+        "ORDER BY subevent_code, sort_order"
+      ]
+    },
+    {
+      "name": "pair_facts",
+      "displayName": "Pair Facts",
+      "queryLines": [
+        "WITH sel AS (\n",
+        "  SELECT\n",
+        "    COALESCE(NULLIF(REGEXP_EXTRACT(:p_subevent, '\\\\(([A-Z]+)\\\\)$', 1), ''), 'MD') AS sub,\n",
+        "    NULLIF(REGEXP_EXTRACT(:p_pair, '\\\\(([0-9]+)\\\\)$', 1), '') AS raw_pid\n",
+        "),\n",
+        "pick AS (\n",
+        "  -- selected pair if it belongs to the selected subevent, else that subevent's top-ranked pair\n",
+        "  SELECT o.pair_ittfid AS pid, o.subevent_code AS sub\n",
+        "  FROM wttrankingsbi.gold.v_pair_profile o\n",
+        "  CROSS JOIN sel\n",
+        "  WHERE o.ranking_run_code = 'SEN' AND o.subevent_code = sel.sub\n",
+        "  ORDER BY CASE WHEN o.pair_ittfid = sel.raw_pid THEN 0 ELSE 1 END, o.sort_order\n",
+        "  LIMIT 1\n",
+        "),\n",
+        "pr AS (\n",
+        "  SELECT p.*\n",
+        "  FROM wttrankingsbi.gold.v_pair_profile p\n",
+        "  JOIN pick k ON p.pair_ittfid = k.pid AND p.subevent_code = k.sub\n",
+        "  WHERE p.ranking_run_code = 'SEN'\n",
+        "),\n",
+        "i1 AS (\n",
+        "  SELECT i.*\n",
+        "  FROM wttrankingsbi.gold.v_pair_partner_doubles_individual i\n",
+        "  JOIN pick k ON i.pair_ittfid = k.pid AND i.subevent_code = k.sub\n",
+        "  WHERE i.ranking_run_code = 'SEN' AND i.partner_no = 1\n",
+        "),\n",
+        "i2 AS (\n",
+        "  SELECT i.*\n",
+        "  FROM wttrankingsbi.gold.v_pair_partner_doubles_individual i\n",
+        "  JOIN pick k ON i.pair_ittfid = k.pid AND i.subevent_code = k.sub\n",
+        "  WHERE i.ranking_run_code = 'SEN' AND i.partner_no = 2\n",
+        ")\n",
+        "SELECT\n",
+        "  pr.pair_ittfid,\n",
+        "  pr.pair_name,\n",
+        "  pr.subevent_code,\n",
+        "  pr.subevent_label,\n",
+        "  pr.partner1_ittfid,\n",
+        "  pr.partner1_name,\n",
+        "  pr.partner2_ittfid,\n",
+        "  pr.partner2_name,\n",
+        "  CONCAT(\n",
+        "    '<div style=\"font-family:Inter,sans-serif;padding:6px 4px\">',\n",
+        "    '<div style=\"font-size:10px;font-weight:700;letter-spacing:.08em;color:#C1121F\">PAIR ITTF ID</div>',\n",
+        "    '<div style=\"font-size:30px;font-weight:800;color:#0B1F2A;line-height:1.15;margin:2px 0 4px\">', pr.pair_ittfid, '</div>',\n",
+        "    '<div style=\"font-size:11px;color:#64748B\">', pr.subevent_label, '</div>',\n",
+        "    '<div style=\"border-top:1px solid #E2E8F0;margin:12px 0 10px\"></div>',\n",
+        "    '<div style=\"margin-bottom:10px\"><div style=\"font-size:9px;font-weight:700;letter-spacing:.08em;color:#94A3B8\">PLAYER 1</div>',\n",
+        "    CASE\n",
+        "      WHEN pr.partner1_ittfid IS NULL THEN '<div style=\"font-size:13px;color:#64748B\">Not resolved in dim_pair</div>'\n",
+        "      ELSE CONCAT(\n",
+        "        '<a href=\"https://www.worldtabletennis.com/playerDescription?playerId=', pr.partner1_ittfid,\n",
+        "        '\" target=\"_blank\" style=\"color:#0B1F2A;font-size:14px;font-weight:700;text-decoration:none\">',\n",
+        "        COALESCE(pr.partner1_name, CONCAT('ITTF ', pr.partner1_ittfid)), '</a>',\n",
+        "        '<div style=\"font-size:11px;color:#64748B\">ITTF ID <b style=\"color:#C1121F\">', pr.partner1_ittfid, '</b>',\n",
+        "        COALESCE(CONCAT(' · ', pr.partner1_country_code), ''), '</div>'\n",
+        "      )\n",
+        "    END,\n",
+        "    '</div>',\n",
+        "    '<div style=\"margin-bottom:10px\"><div style=\"font-size:9px;font-weight:700;letter-spacing:.08em;color:#94A3B8\">PLAYER 2</div>',\n",
+        "    CASE\n",
+        "      WHEN pr.partner2_ittfid IS NULL THEN '<div style=\"font-size:13px;color:#64748B\">Not resolved in dim_pair</div>'\n",
+        "      ELSE CONCAT(\n",
+        "        '<a href=\"https://www.worldtabletennis.com/playerDescription?playerId=', pr.partner2_ittfid,\n",
+        "        '\" target=\"_blank\" style=\"color:#0B1F2A;font-size:14px;font-weight:700;text-decoration:none\">',\n",
+        "        COALESCE(pr.partner2_name, CONCAT('ITTF ', pr.partner2_ittfid)), '</a>',\n",
+        "        '<div style=\"font-size:11px;color:#64748B\">ITTF ID <b style=\"color:#C1121F\">', pr.partner2_ittfid, '</b>',\n",
+        "        COALESCE(CONCAT(' · ', pr.partner2_country_code), ''), '</div>'\n",
+        "      )\n",
+        "    END,\n",
+        "    '</div>',\n",
+        "    '</div>'\n",
+        "  ) AS id_card_html,\n",
+        "  CONCAT(\n",
+        "    '<div style=\"font-family:Inter,sans-serif\">',\n",
+        "    '<div style=\"font-size:10px;font-weight:700;letter-spacing:.08em;color:#C1121F\">', UPPER(pr.subevent_label), '</div>',\n",
+        "    '<div style=\"font-size:20px;font-weight:800;color:#0B1F2A;margin:4px 0\">', pr.pair_name, '</div>',\n",
+        "    '<div style=\"font-size:11px;color:#64748B;margin-bottom:10px\">Pair ITTF ID ', pr.pair_ittfid, ' | ', CONCAT('Week ', LPAD(CAST(pr.latest_week AS STRING), 2, '0'), ', ', CAST(pr.latest_year AS STRING)), '</div>',\n",
+        "    CASE\n",
+        "      WHEN pr.is_cross_country = true THEN CONCAT('<span style=\"display:inline-block;padding:2px 9px;border-radius:999px;font-size:10px;font-weight:700;color:#FFFFFF;background:#7C3AED;margin-right:6px\">', 'Cross-federation', '</span>')\n",
+        "      WHEN pr.is_cross_country = false THEN CONCAT('<span style=\"display:inline-block;padding:2px 9px;border-radius:999px;font-size:10px;font-weight:700;color:#FFFFFF;background:#059669;margin-right:6px\">', CONCAT('Same federation · ', COALESCE(pr.partner1_country_code, '')), '</span>')\n",
+        "      ELSE ''\n",
+        "    END,\n",
+        "    CASE\n",
+        "      WHEN pr.is_currently_ranked THEN CONCAT('<span style=\"display:inline-block;padding:2px 9px;border-radius:999px;font-size:10px;font-weight:700;color:#FFFFFF;background:#1D4ED8;margin-right:6px\">', 'Ranked this week', '</span>')\n",
+        "      ELSE CONCAT('<span style=\"display:inline-block;padding:2px 9px;border-radius:999px;font-size:10px;font-weight:700;color:#FFFFFF;background:#C1121F;margin-right:6px\">', CONCAT('Last ranked ', CAST(pr.last_ranked_year AS STRING), ' W', LPAD(CAST(pr.last_ranked_week AS STRING), 2, '0')), '</span>')\n",
+        "    END,\n",
+        "    '<div style=\"border-top:3px solid #C1121F;width:36px;margin-top:12px\"></div>',\n",
+        "    '<div style=\"padding-top:8px;font-size:12px;color:#334155\">Ranked together since <b>',\n",
+        "    CAST(pr.first_ranked_year AS STRING), ' W', LPAD(CAST(pr.first_ranked_week AS STRING), 2, '0'),\n",
+        "    '</b> · <b>', CAST(pr.weeks_ranked AS STRING), '</b> weeks ranked · <b>',\n",
+        "    CAST(pr.weeks_in_top10 AS STRING), '</b> weeks in the Top 10</div>',\n",
+        "    '</div>'\n",
+        "  ) AS header_html,\n",
+        "  CONCAT(COALESCE(pr.subevent_name, pr.subevent_code), ' Ranking') AS pair_label,\n",
+        "  COALESCE(CONCAT('#', CAST(pr.current_rank AS STRING)), 'NONE') AS pair_current_rank,\n",
+        "  CONCAT('Week ', LPAD(CAST(pr.latest_week AS STRING), 2, '0'), ', ', CAST(pr.latest_year AS STRING)) AS pair_current_period,\n",
+        "  COALESCE(CONCAT('#', CAST(pr.best_rank AS STRING)), 'NONE') AS pair_best_rank,\n",
+        "  COALESCE(CONCAT('Week ', LPAD(CAST(pr.best_rank_week AS STRING), 2, '0'), ', ', CAST(pr.best_rank_year AS STRING)), '') AS pair_best_period,\n",
+        "  COALESCE(pr.partner1_name, 'Player 1') AS p1_label,\n",
+        "  COALESCE(CONCAT('#', CAST(i1.current_rank AS STRING)), 'NONE') AS p1_current_rank,\n",
+        "  CONCAT('Week ', LPAD(CAST(COALESCE(i1.latest_week, pr.latest_week) AS STRING), 2, '0'), ', ', CAST(COALESCE(i1.latest_year, pr.latest_year) AS STRING)) AS p1_current_period,\n",
+        "  COALESCE(CONCAT('#', CAST(i1.best_rank AS STRING)), 'NONE') AS p1_best_rank,\n",
+        "  COALESCE(CONCAT('Week ', LPAD(CAST(i1.best_rank_week AS STRING), 2, '0'), ', ', CAST(i1.best_rank_year AS STRING)), '') AS p1_best_period,\n",
+        "  COALESCE(pr.partner2_name, 'Player 2') AS p2_label,\n",
+        "  COALESCE(CONCAT('#', CAST(i2.current_rank AS STRING)), 'NONE') AS p2_current_rank,\n",
+        "  CONCAT('Week ', LPAD(CAST(COALESCE(i2.latest_week, pr.latest_week) AS STRING), 2, '0'), ', ', CAST(COALESCE(i2.latest_year, pr.latest_year) AS STRING)) AS p2_current_period,\n",
+        "  COALESCE(CONCAT('#', CAST(i2.best_rank AS STRING)), 'NONE') AS p2_best_rank,\n",
+        "  COALESCE(CONCAT('Week ', LPAD(CAST(i2.best_rank_week AS STRING), 2, '0'), ', ', CAST(i2.best_rank_year AS STRING)), '') AS p2_best_period,\n",
+        "  CAST(ROUND(pr.current_points) AS INT) AS current_points,   -- NULL when not ranked this week\n",
+        "  pr.places_gained AS rank_change,                            -- previous_rank - current_rank; + = climbed, NULL = new/unranked\n",
+        "  CAST(ROUND(pr.highest_points) AS INT) AS highest_points,\n",
+        "  pr.weeks_ranked,\n",
+        "  pr.weeks_in_top10,\n",
+        "  pr.best_rank\n",
+        "FROM pr\n",
+        "LEFT JOIN i1 ON TRUE\n",
+        "LEFT JOIN i2 ON TRUE"
+      ],
+      "parameters": [
+        {
+          "displayName": "Subevent",
+          "keyword": "p_subevent",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "Men's Doubles (MD)"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "displayName": "Pair",
+          "keyword": "p_pair",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "#00000 · Top-ranked pair (auto)"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "pair_trend",
+      "displayName": "Pair — Ranking History",
+      "queryLines": [
+        "WITH sel AS (\n",
+        "  SELECT\n",
+        "    COALESCE(NULLIF(REGEXP_EXTRACT(:p_subevent, '\\\\(([A-Z]+)\\\\)$', 1), ''), 'MD') AS sub,\n",
+        "    NULLIF(REGEXP_EXTRACT(:p_pair, '\\\\(([0-9]+)\\\\)$', 1), '') AS raw_pid\n",
+        "),\n",
+        "pick AS (\n",
+        "  -- selected pair if it belongs to the selected subevent, else that subevent's top-ranked pair\n",
+        "  SELECT o.pair_ittfid AS pid, o.subevent_code AS sub\n",
+        "  FROM wttrankingsbi.gold.v_pair_profile o\n",
+        "  CROSS JOIN sel\n",
+        "  WHERE o.ranking_run_code = 'SEN' AND o.subevent_code = sel.sub\n",
+        "  ORDER BY CASE WHEN o.pair_ittfid = sel.raw_pid THEN 0 ELSE 1 END, o.sort_order\n",
+        "  LIMIT 1\n",
+        ")\n",
+        "SELECT\n",
+        "  h.period_label,\n",
+        "  h.period_key,\n",
+        "  h.period_date,\n",
+        "  h.current_rank,\n",
+        "  h.ranking_points,\n",
+        "  h.is_current_week,\n",
+        "  h.is_last_ranked,\n",
+        "  h.current_annotation\n",
+        "FROM wttrankingsbi.gold.v_pair_ranking_history h\n",
+        "JOIN pick k ON h.pair_ittfid = k.pid AND h.subevent_code = k.sub\n",
+        "WHERE h.ranking_run_code = 'SEN'\n",
+        "ORDER BY h.period_key"
+      ],
+      "parameters": [
+        {
+          "displayName": "Subevent",
+          "keyword": "p_subevent",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "Men's Doubles (MD)"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "displayName": "Pair",
+          "keyword": "p_pair",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "#00000 · Top-ranked pair (auto)"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "pair_partner_trend",
+      "displayName": "Pair — Partner Doubles Individual History",
+      "queryLines": [
+        "WITH sel AS (\n",
+        "  SELECT\n",
+        "    COALESCE(NULLIF(REGEXP_EXTRACT(:p_subevent, '\\\\(([A-Z]+)\\\\)$', 1), ''), 'MD') AS sub,\n",
+        "    NULLIF(REGEXP_EXTRACT(:p_pair, '\\\\(([0-9]+)\\\\)$', 1), '') AS raw_pid\n",
+        "),\n",
+        "pick AS (\n",
+        "  -- selected pair if it belongs to the selected subevent, else that subevent's top-ranked pair\n",
+        "  SELECT o.pair_ittfid AS pid, o.subevent_code AS sub\n",
+        "  FROM wttrankingsbi.gold.v_pair_profile o\n",
+        "  CROSS JOIN sel\n",
+        "  WHERE o.ranking_run_code = 'SEN' AND o.subevent_code = sel.sub\n",
+        "  ORDER BY CASE WHEN o.pair_ittfid = sel.raw_pid THEN 0 ELSE 1 END, o.sort_order\n",
+        "  LIMIT 1\n",
+        ")\n",
+        "SELECT\n",
+        "  h.partner_no,\n",
+        "  h.partner_label,\n",
+        "  h.individual_subevent_code,\n",
+        "  h.period_label,\n",
+        "  h.period_key,\n",
+        "  h.current_rank,\n",
+        "  h.ranking_points\n",
+        "FROM wttrankingsbi.gold.v_pair_partner_doubles_individual_history h\n",
+        "JOIN pick k ON h.pair_ittfid = k.pid AND h.subevent_code = k.sub\n",
+        "WHERE h.ranking_run_code = 'SEN'\n",
+        "ORDER BY h.partner_no, h.period_key"
+      ],
+      "parameters": [
+        {
+          "displayName": "Subevent",
+          "keyword": "p_subevent",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "Men's Doubles (MD)"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "displayName": "Pair",
+          "keyword": "p_pair",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "#00000 · Top-ranked pair (auto)"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "pair_leaderboard",
+      "displayName": "Pair — Subevent Leaderboard",
+      "queryLines": [
+        "WITH sel AS (\n",
+        "  SELECT\n",
+        "    COALESCE(NULLIF(REGEXP_EXTRACT(:p_subevent, '\\\\(([A-Z]+)\\\\)$', 1), ''), 'MD') AS sub,\n",
+        "    NULLIF(REGEXP_EXTRACT(:p_pair, '\\\\(([0-9]+)\\\\)$', 1), '') AS raw_pid\n",
+        "),\n",
+        "pick AS (\n",
+        "  -- selected pair if it belongs to the selected subevent, else that subevent's top-ranked pair\n",
+        "  SELECT o.pair_ittfid AS pid, o.subevent_code AS sub\n",
+        "  FROM wttrankingsbi.gold.v_pair_profile o\n",
+        "  CROSS JOIN sel\n",
+        "  WHERE o.ranking_run_code = 'SEN' AND o.subevent_code = sel.sub\n",
+        "  ORDER BY CASE WHEN o.pair_ittfid = sel.raw_pid THEN 0 ELSE 1 END, o.sort_order\n",
+        "  LIMIT 1\n",
+        ")\n",
+        "SELECT\n",
+        "  l.current_rank,\n",
+        "  l.pair_name,\n",
+        "  l.pair_ittfid,\n",
+        "  l.federations,\n",
+        "  CAST(ROUND(l.current_points) AS INT) AS points,\n",
+        "  l.movement_label,\n",
+        "  l.movement_dir,\n",
+        "  l.weeks_ranked,\n",
+        "  l.best_rank,\n",
+        "  CASE WHEN l.pair_ittfid = k.pid THEN 'SELECTED' ELSE '' END AS selected_flag\n",
+        "FROM wttrankingsbi.gold.v_pair_leaderboard l\n",
+        "JOIN sel s ON l.subevent_code = s.sub\n",
+        "LEFT JOIN pick k ON TRUE\n",
+        "WHERE l.ranking_run_code = 'SEN'\n",
+        "ORDER BY l.current_rank, l.pair_ittfid\n",
+        "LIMIT 20"
+      ],
+      "parameters": [
+        {
+          "displayName": "Subevent",
+          "keyword": "p_subevent",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "Men's Doubles (MD)"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "displayName": "Pair",
+          "keyword": "p_pair",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "#00000 · Top-ranked pair (auto)"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "pair_movers",
+      "displayName": "Pair — Biggest Climbers",
+      "queryLines": [
+        "WITH sel AS (\n",
+        "  SELECT\n",
+        "    COALESCE(NULLIF(REGEXP_EXTRACT(:p_subevent, '\\\\(([A-Z]+)\\\\)$', 1), ''), 'MD') AS sub\n",
+        ")\n",
+        "SELECT\n",
+        "  l.pair_name,\n",
+        "  l.current_rank,\n",
+        "  l.previous_rank,\n",
+        "  l.places_gained\n",
+        "FROM wttrankingsbi.gold.v_pair_leaderboard l\n",
+        "JOIN sel s ON l.subevent_code = s.sub\n",
+        "WHERE l.ranking_run_code = 'SEN' AND l.places_gained > 0\n",
+        "ORDER BY l.places_gained DESC, l.current_rank\n",
+        "LIMIT 10"
+      ],
+      "parameters": [
+        {
+          "displayName": "Subevent",
+          "keyword": "p_subevent",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "Men's Doubles (MD)"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "pair_longevity",
+      "displayName": "Pair — Partnership Longevity",
+      "queryLines": [
+        "WITH sel AS (\n",
+        "  SELECT\n",
+        "    COALESCE(NULLIF(REGEXP_EXTRACT(:p_subevent, '\\\\(([A-Z]+)\\\\)$', 1), ''), 'MD') AS sub\n",
+        ")\n",
+        "SELECT\n",
+        "  p.pair_name,\n",
+        "  CONCAT_WS(' / ', p.partner1_country_code, p.partner2_country_code) AS federations,\n",
+        "  p.weeks_ranked,\n",
+        "  p.weeks_in_top10,\n",
+        "  p.best_rank,\n",
+        "  CONCAT(CAST(p.first_ranked_year AS STRING), ' W', LPAD(CAST(p.first_ranked_week AS STRING), 2, '0')) AS ranked_since,\n",
+        "  CASE WHEN p.is_currently_ranked THEN 'Active' ELSE 'Inactive' END AS status\n",
+        "FROM wttrankingsbi.gold.v_pair_profile p\n",
+        "JOIN sel s ON p.subevent_code = s.sub\n",
+        "WHERE p.ranking_run_code = 'SEN'\n",
+        "ORDER BY p.weeks_ranked DESC, p.best_rank, p.pair_ittfid\n",
+        "LIMIT 15"
+      ],
+      "parameters": [
+        {
+          "displayName": "Subevent",
+          "keyword": "p_subevent",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "Men's Doubles (MD)"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "pair_federation_mix",
+      "displayName": "Pair — Federation Mix",
+      "queryLines": [
+        "WITH sel AS (\n",
+        "  SELECT\n",
+        "    COALESCE(NULLIF(REGEXP_EXTRACT(:p_subevent, '\\\\(([A-Z]+)\\\\)$', 1), ''), 'MD') AS sub\n",
+        ")\n",
+        "SELECT\n",
+        "  l.partnership_type,\n",
+        "  COUNT(*) AS pairs\n",
+        "FROM wttrankingsbi.gold.v_pair_leaderboard l\n",
+        "JOIN sel s ON l.subevent_code = s.sub\n",
+        "WHERE l.ranking_run_code = 'SEN'\n",
+        "GROUP BY l.partnership_type"
+      ],
+      "parameters": [
+        {
+          "displayName": "Subevent",
+          "keyword": "p_subevent",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "Men's Doubles (MD)"
+                }
+              ]
+            }
+          }
+        }
       ]
     }
   ],
@@ -4483,6 +4979,1614 @@
             "y": 0,
             "width": 6,
             "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "pairs_performance",
+      "displayName": "Pairs Performance",
+      "layout": [
+        {
+          "widget": {
+            "name": "pair_id_card",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "pair_facts",
+                  "fields": [
+                    {
+                      "name": "id_card_html",
+                      "expression": "`id_card_html`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": false,
+                "title": {
+                  "value": "Pair & Player ITTF IDs",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "displayRowNumbers": false,
+              "rowsPerPage": 1,
+              "headerHeight": 0,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "id_card_html",
+                    "displayName": " ",
+                    "style": {
+                      "type": "html",
+                      "highlightLinks": true
+                    }
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "pair_header_html",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "pair_facts",
+                  "fields": [
+                    {
+                      "name": "header_html",
+                      "expression": "`header_html`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": false,
+                "title": {
+                  "value": "Pair Header",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "displayRowNumbers": false,
+              "rowsPerPage": 1,
+              "headerHeight": 0,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "header_html",
+                    "displayName": " ",
+                    "style": {
+                      "type": "html",
+                      "highlightLinks": true
+                    }
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 0,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "pair_subevent_filter",
+            "queries": [
+              {
+                "name": "pairs_filter_subevent_label",
+                "query": {
+                  "datasetName": "pair_options",
+                  "fields": [
+                    {
+                      "name": "subevent_label",
+                      "expression": "`subevent_label`"
+                    },
+                    {
+                      "name": "subevent_label_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_pairs_pair_facts_p_subevent",
+                "query": {
+                  "datasetName": "pair_facts",
+                  "parameters": [
+                    {
+                      "name": "p_subevent",
+                      "keyword": "p_subevent"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_pairs_pair_trend_p_subevent",
+                "query": {
+                  "datasetName": "pair_trend",
+                  "parameters": [
+                    {
+                      "name": "p_subevent",
+                      "keyword": "p_subevent"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_pairs_pair_partner_trend_p_subevent",
+                "query": {
+                  "datasetName": "pair_partner_trend",
+                  "parameters": [
+                    {
+                      "name": "p_subevent",
+                      "keyword": "p_subevent"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_pairs_pair_leaderboard_p_subevent",
+                "query": {
+                  "datasetName": "pair_leaderboard",
+                  "parameters": [
+                    {
+                      "name": "p_subevent",
+                      "keyword": "p_subevent"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_pairs_pair_movers_p_subevent",
+                "query": {
+                  "datasetName": "pair_movers",
+                  "parameters": [
+                    {
+                      "name": "p_subevent",
+                      "keyword": "p_subevent"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_pairs_pair_longevity_p_subevent",
+                "query": {
+                  "datasetName": "pair_longevity",
+                  "parameters": [
+                    {
+                      "name": "p_subevent",
+                      "keyword": "p_subevent"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_pairs_pair_federation_mix_p_subevent",
+                "query": {
+                  "datasetName": "pair_federation_mix",
+                  "parameters": [
+                    {
+                      "name": "p_subevent",
+                      "keyword": "p_subevent"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "scale": {
+                "type": "categorical",
+                "sort": {
+                  "by": "natural-order"
+                }
+              },
+              "version": 2,
+              "selection": {
+                "defaultSelection": {
+                  "values": {
+                    "dataType": "STRING",
+                    "values": [
+                      {
+                        "value": "Men's Doubles (MD)"
+                      }
+                    ]
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Subevent",
+                  "fields": []
+                }
+              },
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "subevent_label",
+                    "queryName": "pairs_filter_subevent_label"
+                  },
+                  {
+                    "parameterName": "p_subevent",
+                    "queryName": "parameter_pairs_pair_facts_p_subevent"
+                  },
+                  {
+                    "parameterName": "p_subevent",
+                    "queryName": "parameter_pairs_pair_trend_p_subevent"
+                  },
+                  {
+                    "parameterName": "p_subevent",
+                    "queryName": "parameter_pairs_pair_partner_trend_p_subevent"
+                  },
+                  {
+                    "parameterName": "p_subevent",
+                    "queryName": "parameter_pairs_pair_leaderboard_p_subevent"
+                  },
+                  {
+                    "parameterName": "p_subevent",
+                    "queryName": "parameter_pairs_pair_movers_p_subevent"
+                  },
+                  {
+                    "parameterName": "p_subevent",
+                    "queryName": "parameter_pairs_pair_longevity_p_subevent"
+                  },
+                  {
+                    "parameterName": "p_subevent",
+                    "queryName": "parameter_pairs_pair_federation_mix_p_subevent"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 0,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "pair_filter",
+            "queries": [
+              {
+                "name": "pairs_filter_display_label",
+                "query": {
+                  "datasetName": "pair_options",
+                  "fields": [
+                    {
+                      "name": "display_label",
+                      "expression": "`display_label`"
+                    },
+                    {
+                      "name": "display_label_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_pairs_pair_facts_p_pair",
+                "query": {
+                  "datasetName": "pair_facts",
+                  "parameters": [
+                    {
+                      "name": "p_pair",
+                      "keyword": "p_pair"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_pairs_pair_trend_p_pair",
+                "query": {
+                  "datasetName": "pair_trend",
+                  "parameters": [
+                    {
+                      "name": "p_pair",
+                      "keyword": "p_pair"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_pairs_pair_partner_trend_p_pair",
+                "query": {
+                  "datasetName": "pair_partner_trend",
+                  "parameters": [
+                    {
+                      "name": "p_pair",
+                      "keyword": "p_pair"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "parameter_pairs_pair_leaderboard_p_pair",
+                "query": {
+                  "datasetName": "pair_leaderboard",
+                  "parameters": [
+                    {
+                      "name": "p_pair",
+                      "keyword": "p_pair"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "scale": {
+                "type": "categorical",
+                "sort": {
+                  "by": "natural-order"
+                }
+              },
+              "version": 2,
+              "selection": {
+                "defaultSelection": {
+                  "values": {
+                    "dataType": "STRING",
+                    "values": [
+                      {
+                        "value": "#00000 · Top-ranked pair (auto)"
+                      }
+                    ]
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Pair",
+                  "fields": []
+                }
+              },
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "display_label",
+                    "queryName": "pairs_filter_display_label"
+                  },
+                  {
+                    "parameterName": "p_pair",
+                    "queryName": "parameter_pairs_pair_facts_p_pair"
+                  },
+                  {
+                    "parameterName": "p_pair",
+                    "queryName": "parameter_pairs_pair_trend_p_pair"
+                  },
+                  {
+                    "parameterName": "p_pair",
+                    "queryName": "parameter_pairs_pair_partner_trend_p_pair"
+                  },
+                  {
+                    "parameterName": "p_pair",
+                    "queryName": "parameter_pairs_pair_leaderboard_p_pair"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 2,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "pair_weeks_ranked",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "pair_facts",
+                  "fields": [
+                    {
+                      "name": "max(weeks_ranked)",
+                      "expression": "MAX(`weeks_ranked`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "<span style=\"font-size: 12px;\">Weeks Ranked Together</span>",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "max(weeks_ranked)"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 4,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "pair_ranking_card",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "pair_facts",
+                  "fields": [
+                    {
+                      "name": "ranking_label",
+                      "expression": "`pair_label`"
+                    },
+                    {
+                      "name": "current_rank_display",
+                      "expression": "`pair_current_rank`"
+                    },
+                    {
+                      "name": "current_period_display",
+                      "expression": "`pair_current_period`"
+                    },
+                    {
+                      "name": "best_rank_display",
+                      "expression": "`pair_best_rank`"
+                    },
+                    {
+                      "name": "best_period_display",
+                      "expression": "`pair_best_period`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Pair Ranking",
+                  "fields": []
+                }
+              },
+              "jsonSpec": {
+                "type": "vega-lite",
+                "spec": "{\"$schema\":\"https://vega.github.io/schema/vega-lite/v6.json\",\"data\":{\"name\":\"databricks_query\"},\"width\":\"container\",\"height\":\"container\",\"config\":{\"autosize\":{\"type\":\"fit\",\"contains\":\"padding\"},\"view\":{\"stroke\":null},\"background\":\"transparent\",\"font\":\"Inter\"},\"layer\":[{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":13,\"fontWeight\":700,\"color\":\"#0B1F2A\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":20},\"text\":{\"field\":\"ranking_label\"}}},{\"mark\":{\"type\":\"rule\",\"color\":\"#C1121F\",\"strokeWidth\":3,\"strokeCap\":\"round\"},\"encoding\":{\"x\":{\"value\":14},\"x2\":{\"value\":50},\"y\":{\"value\":30}}},{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":9,\"fontWeight\":700,\"color\":\"#C1121F\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":48},\"text\":{\"value\":\"CURRENT\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"right\",\"fontSize\":9,\"fontWeight\":700,\"color\":\"#94A3B8\"},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width-14\"}},\"y\":{\"value\":48},\"text\":{\"value\":\"BEST\"}}},{\"mark\":{\"type\":\"rule\",\"color\":\"#E2E8F0\",\"strokeWidth\":1},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width/2\"}},\"y\":{\"value\":42},\"y2\":{\"value\":110}}},{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":32,\"fontWeight\":800,\"color\":\"#0B1F2A\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":80},\"text\":{\"field\":\"current_rank_display\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":10,\"color\":\"#64748B\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":102},\"text\":{\"field\":\"current_period_display\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"right\",\"fontSize\":32,\"fontWeight\":800,\"color\":\"#64748B\"},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width-14\"}},\"y\":{\"value\":80},\"text\":{\"field\":\"best_rank_display\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"right\",\"fontSize\":10,\"color\":\"#94A3B8\"},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width-14\"}},\"y\":{\"value\":102},\"text\":{\"field\":\"best_period_display\"}}}]}"
+              },
+              "version": 1,
+              "widgetType": "custom-vega-viz",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "ranking_label"
+                  },
+                  {
+                    "fieldName": "current_rank_display"
+                  },
+                  {
+                    "fieldName": "current_period_display"
+                  },
+                  {
+                    "fieldName": "best_rank_display"
+                  },
+                  {
+                    "fieldName": "best_period_display"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 6,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "pair_p1_ind_card",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "pair_facts",
+                  "fields": [
+                    {
+                      "name": "ranking_label",
+                      "expression": "`p1_label`"
+                    },
+                    {
+                      "name": "current_rank_display",
+                      "expression": "`p1_current_rank`"
+                    },
+                    {
+                      "name": "current_period_display",
+                      "expression": "`p1_current_period`"
+                    },
+                    {
+                      "name": "best_rank_display",
+                      "expression": "`p1_best_rank`"
+                    },
+                    {
+                      "name": "best_period_display",
+                      "expression": "`p1_best_period`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Player 1 — Doubles Individual Ranking",
+                  "fields": []
+                }
+              },
+              "jsonSpec": {
+                "type": "vega-lite",
+                "spec": "{\"$schema\":\"https://vega.github.io/schema/vega-lite/v6.json\",\"data\":{\"name\":\"databricks_query\"},\"width\":\"container\",\"height\":\"container\",\"config\":{\"autosize\":{\"type\":\"fit\",\"contains\":\"padding\"},\"view\":{\"stroke\":null},\"background\":\"transparent\",\"font\":\"Inter\"},\"layer\":[{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":13,\"fontWeight\":700,\"color\":\"#0B1F2A\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":20},\"text\":{\"field\":\"ranking_label\"}}},{\"mark\":{\"type\":\"rule\",\"color\":\"#C1121F\",\"strokeWidth\":3,\"strokeCap\":\"round\"},\"encoding\":{\"x\":{\"value\":14},\"x2\":{\"value\":50},\"y\":{\"value\":30}}},{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":9,\"fontWeight\":700,\"color\":\"#C1121F\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":48},\"text\":{\"value\":\"CURRENT\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"right\",\"fontSize\":9,\"fontWeight\":700,\"color\":\"#94A3B8\"},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width-14\"}},\"y\":{\"value\":48},\"text\":{\"value\":\"BEST\"}}},{\"mark\":{\"type\":\"rule\",\"color\":\"#E2E8F0\",\"strokeWidth\":1},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width/2\"}},\"y\":{\"value\":42},\"y2\":{\"value\":110}}},{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":32,\"fontWeight\":800,\"color\":\"#0B1F2A\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":80},\"text\":{\"field\":\"current_rank_display\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":10,\"color\":\"#64748B\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":102},\"text\":{\"field\":\"current_period_display\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"right\",\"fontSize\":32,\"fontWeight\":800,\"color\":\"#64748B\"},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width-14\"}},\"y\":{\"value\":80},\"text\":{\"field\":\"best_rank_display\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"right\",\"fontSize\":10,\"color\":\"#94A3B8\"},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width-14\"}},\"y\":{\"value\":102},\"text\":{\"field\":\"best_period_display\"}}}]}"
+              },
+              "version": 1,
+              "widgetType": "custom-vega-viz",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "ranking_label"
+                  },
+                  {
+                    "fieldName": "current_rank_display"
+                  },
+                  {
+                    "fieldName": "current_period_display"
+                  },
+                  {
+                    "fieldName": "best_rank_display"
+                  },
+                  {
+                    "fieldName": "best_period_display"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 6,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "pair_p2_ind_card",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "pair_facts",
+                  "fields": [
+                    {
+                      "name": "ranking_label",
+                      "expression": "`p2_label`"
+                    },
+                    {
+                      "name": "current_rank_display",
+                      "expression": "`p2_current_rank`"
+                    },
+                    {
+                      "name": "current_period_display",
+                      "expression": "`p2_current_period`"
+                    },
+                    {
+                      "name": "best_rank_display",
+                      "expression": "`p2_best_rank`"
+                    },
+                    {
+                      "name": "best_period_display",
+                      "expression": "`p2_best_period`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Player 2 — Doubles Individual Ranking",
+                  "fields": []
+                }
+              },
+              "jsonSpec": {
+                "type": "vega-lite",
+                "spec": "{\"$schema\":\"https://vega.github.io/schema/vega-lite/v6.json\",\"data\":{\"name\":\"databricks_query\"},\"width\":\"container\",\"height\":\"container\",\"config\":{\"autosize\":{\"type\":\"fit\",\"contains\":\"padding\"},\"view\":{\"stroke\":null},\"background\":\"transparent\",\"font\":\"Inter\"},\"layer\":[{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":13,\"fontWeight\":700,\"color\":\"#0B1F2A\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":20},\"text\":{\"field\":\"ranking_label\"}}},{\"mark\":{\"type\":\"rule\",\"color\":\"#C1121F\",\"strokeWidth\":3,\"strokeCap\":\"round\"},\"encoding\":{\"x\":{\"value\":14},\"x2\":{\"value\":50},\"y\":{\"value\":30}}},{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":9,\"fontWeight\":700,\"color\":\"#C1121F\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":48},\"text\":{\"value\":\"CURRENT\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"right\",\"fontSize\":9,\"fontWeight\":700,\"color\":\"#94A3B8\"},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width-14\"}},\"y\":{\"value\":48},\"text\":{\"value\":\"BEST\"}}},{\"mark\":{\"type\":\"rule\",\"color\":\"#E2E8F0\",\"strokeWidth\":1},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width/2\"}},\"y\":{\"value\":42},\"y2\":{\"value\":110}}},{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":32,\"fontWeight\":800,\"color\":\"#0B1F2A\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":80},\"text\":{\"field\":\"current_rank_display\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"left\",\"fontSize\":10,\"color\":\"#64748B\"},\"encoding\":{\"x\":{\"value\":14},\"y\":{\"value\":102},\"text\":{\"field\":\"current_period_display\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"right\",\"fontSize\":32,\"fontWeight\":800,\"color\":\"#64748B\"},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width-14\"}},\"y\":{\"value\":80},\"text\":{\"field\":\"best_rank_display\"}}},{\"mark\":{\"type\":\"text\",\"align\":\"right\",\"fontSize\":10,\"color\":\"#94A3B8\"},\"encoding\":{\"x\":{\"value\":{\"expr\":\"width-14\"}},\"y\":{\"value\":102},\"text\":{\"field\":\"best_period_display\"}}}]}"
+              },
+              "version": 1,
+              "widgetType": "custom-vega-viz",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "ranking_label"
+                  },
+                  {
+                    "fieldName": "current_rank_display"
+                  },
+                  {
+                    "fieldName": "current_period_display"
+                  },
+                  {
+                    "fieldName": "best_rank_display"
+                  },
+                  {
+                    "fieldName": "best_period_display"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 6,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "pair_current_points",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "pair_facts",
+                  "fields": [
+                    {
+                      "name": "max(current_points)",
+                      "expression": "MAX(`current_points`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "<span style=\"font-size: 12px;\">Current Points</span>",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "max(current_points)"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 9,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "pair_rank_change",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "pair_facts",
+                  "fields": [
+                    {
+                      "name": "max(rank_change)",
+                      "expression": "MAX(`rank_change`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "<span style=\"font-size: 12px;\">Places Gained This Week (+ climbed / − fell)</span>",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "max(rank_change)"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 9,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "pair_highest_points",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "pair_facts",
+                  "fields": [
+                    {
+                      "name": "max(highest_points)",
+                      "expression": "MAX(`highest_points`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "<span style=\"font-size: 12px;\">Highest Points Ever</span>",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "max(highest_points)"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 9,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "pair_weeks_top10",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "pair_facts",
+                  "fields": [
+                    {
+                      "name": "max(weeks_in_top10)",
+                      "expression": "MAX(`weeks_in_top10`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "<span style=\"font-size: 12px;\">Weeks in Top 10</span>",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "max(weeks_in_top10)"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 9,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "pair_trend_rank",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "pair_trend",
+                  "fields": [
+                    {
+                      "name": "period_label",
+                      "expression": "`period_label`"
+                    },
+                    {
+                      "name": "period_key",
+                      "expression": "`period_key`"
+                    },
+                    {
+                      "name": "current_rank",
+                      "expression": "`current_rank`"
+                    },
+                    {
+                      "name": "ranking_points",
+                      "expression": "`ranking_points`"
+                    },
+                    {
+                      "name": "is_current_week",
+                      "expression": "`is_current_week`"
+                    },
+                    {
+                      "name": "is_last_ranked",
+                      "expression": "`is_last_ranked`"
+                    },
+                    {
+                      "name": "current_annotation",
+                      "expression": "`current_annotation`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Pair — Ranking History",
+                  "fields": []
+                }
+              },
+              "jsonSpec": {
+                "type": "vega-lite",
+                "spec": "{\"$schema\":\"https://vega.github.io/schema/vega-lite/v6.json\",\"data\":{\"name\":\"databricks_query\"},\"width\":\"container\",\"height\":\"container\",\"config\":{\"autosize\":{\"type\":\"fit\",\"contains\":\"padding\"},\"view\":{\"stroke\":null},\"background\":\"transparent\",\"font\":\"Inter\"},\"layer\":[{\"mark\":{\"type\":\"line\",\"strokeWidth\":2.5,\"color\":\"#7570B3\",\"interpolate\":\"monotone\"},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"},\"axis\":{\"title\":null,\"labelExpr\":\"substring(datum.value,6)=='01'?substring(datum.value,0,4):''\",\"labelAngle\":0,\"ticks\":false,\"grid\":false,\"labelPadding\":8,\"labelFontSize\":11,\"labelColor\":\"#64748B\",\"domainColor\":\"#CBD5E1\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\",\"scale\":{\"reverse\":true},\"axis\":{\"title\":null,\"gridDash\":[3,3],\"gridColor\":\"#E2E8F0\",\"gridOpacity\":0.8,\"labelColor\":\"#64748B\",\"domainColor\":\"#CBD5E1\"}},\"tooltip\":[{\"field\":\"period_label\",\"title\":\"Period\"},{\"field\":\"current_rank\",\"title\":\"Rank\"},{\"field\":\"ranking_points\",\"title\":\"Points\"}]}},{\"transform\":[{\"filter\":\"datum.is_current_week==true\"}],\"mark\":{\"type\":\"point\",\"color\":\"#7570B3\",\"size\":90,\"filled\":true,\"stroke\":\"white\",\"strokeWidth\":2},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\"}}},{\"transform\":[{\"filter\":\"datum.is_current_week==true\"}],\"mark\":{\"type\":\"text\",\"align\":\"right\",\"dx\":-12,\"dy\":-12,\"fontSize\":11,\"fontWeight\":\"bold\",\"color\":\"#7570B3\"},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\"},\"text\":{\"field\":\"current_annotation\"}}},{\"transform\":[{\"filter\":\"datum.is_last_ranked==true\"}],\"mark\":{\"type\":\"point\",\"color\":\"#C1121F\",\"size\":90,\"filled\":true,\"stroke\":\"white\",\"strokeWidth\":2},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\"}}},{\"transform\":[{\"filter\":\"datum.is_last_ranked==true\"}],\"mark\":{\"type\":\"text\",\"align\":\"right\",\"dx\":-12,\"dy\":-12,\"fontSize\":11,\"fontWeight\":\"bold\",\"color\":\"#C1121F\"},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\"},\"text\":{\"field\":\"current_annotation\"}}}]}"
+              },
+              "version": 1,
+              "widgetType": "custom-vega-viz",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "period_label"
+                  },
+                  {
+                    "fieldName": "period_key"
+                  },
+                  {
+                    "fieldName": "current_rank"
+                  },
+                  {
+                    "fieldName": "ranking_points"
+                  },
+                  {
+                    "fieldName": "is_current_week"
+                  },
+                  {
+                    "fieldName": "is_last_ranked"
+                  },
+                  {
+                    "fieldName": "current_annotation"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 11,
+            "width": 12,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "pair_trend_points",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "pair_trend",
+                  "fields": [
+                    {
+                      "name": "period_date",
+                      "expression": "`period_date`"
+                    },
+                    {
+                      "name": "max(ranking_points)",
+                      "expression": "MAX(`ranking_points`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Pair — Ranking Points History",
+                  "fields": []
+                },
+                "showDescription": true,
+                "description": {
+                  "value": "Ranking points held each week",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "period_date",
+                  "scale": {
+                    "type": "temporal"
+                  },
+                  "displayName": "Week"
+                },
+                "y": {
+                  "fieldName": "max(ranking_points)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Points"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 18,
+            "width": 6,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "pair_partner_trend",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "pair_partner_trend",
+                  "fields": [
+                    {
+                      "name": "partner_label",
+                      "expression": "`partner_label`"
+                    },
+                    {
+                      "name": "period_label",
+                      "expression": "`period_label`"
+                    },
+                    {
+                      "name": "period_key",
+                      "expression": "`period_key`"
+                    },
+                    {
+                      "name": "current_rank",
+                      "expression": "`current_rank`"
+                    },
+                    {
+                      "name": "ranking_points",
+                      "expression": "`ranking_points`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Players — Doubles Individual Ranking History",
+                  "fields": []
+                },
+                "showDescription": true,
+                "description": {
+                  "value": "Each player's own individual-credit doubles ranking across their whole career (all partners), not only weeks with this partner",
+                  "fields": []
+                }
+              },
+              "jsonSpec": {
+                "type": "vega-lite",
+                "spec": "{\"$schema\":\"https://vega.github.io/schema/vega-lite/v6.json\",\"data\":{\"name\":\"databricks_query\"},\"width\":\"container\",\"height\":\"container\",\"config\":{\"autosize\":{\"type\":\"fit\",\"contains\":\"padding\"},\"view\":{\"stroke\":null},\"background\":\"transparent\",\"font\":\"Inter\"},\"encoding\":{\"x\":{\"field\":\"period_label\",\"type\":\"ordinal\",\"sort\":{\"field\":\"period_key\"},\"axis\":{\"title\":null,\"labelExpr\":\"substring(datum.value,6)=='01'?substring(datum.value,0,4):''\",\"labelAngle\":0,\"ticks\":false,\"grid\":false,\"labelPadding\":8,\"labelFontSize\":11,\"labelColor\":\"#64748B\",\"domainColor\":\"#CBD5E1\"}},\"y\":{\"field\":\"current_rank\",\"type\":\"quantitative\",\"scale\":{\"reverse\":true},\"axis\":{\"title\":null,\"gridDash\":[3,3],\"gridColor\":\"#E2E8F0\",\"gridOpacity\":0.8,\"labelColor\":\"#64748B\",\"domainColor\":\"#CBD5E1\"}},\"color\":{\"field\":\"partner_label\",\"type\":\"nominal\",\"scale\":{\"range\":[\"#C1121F\",\"#1D4ED8\"]},\"legend\":{\"title\":null,\"orient\":\"top\",\"labelFontSize\":11,\"labelColor\":\"#334155\"}}},\"layer\":[{\"mark\":{\"type\":\"line\",\"strokeWidth\":2.2,\"interpolate\":\"monotone\"},\"encoding\":{\"tooltip\":[{\"field\":\"partner_label\",\"title\":\"Player\"},{\"field\":\"period_label\",\"title\":\"Period\"},{\"field\":\"current_rank\",\"title\":\"Rank\"},{\"field\":\"ranking_points\",\"title\":\"Points\"}]}}]}"
+              },
+              "version": 1,
+              "widgetType": "custom-vega-viz",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "partner_label"
+                  },
+                  {
+                    "fieldName": "period_label"
+                  },
+                  {
+                    "fieldName": "period_key"
+                  },
+                  {
+                    "fieldName": "current_rank"
+                  },
+                  {
+                    "fieldName": "ranking_points"
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 18,
+            "width": 6,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "pair_leaderboard",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "pair_leaderboard",
+                  "fields": [
+                    {
+                      "name": "current_rank",
+                      "expression": "`current_rank`"
+                    },
+                    {
+                      "name": "pair_name",
+                      "expression": "`pair_name`"
+                    },
+                    {
+                      "name": "federations",
+                      "expression": "`federations`"
+                    },
+                    {
+                      "name": "points",
+                      "expression": "`points`"
+                    },
+                    {
+                      "name": "movement_label",
+                      "expression": "`movement_label`"
+                    },
+                    {
+                      "name": "movement_dir",
+                      "expression": "`movement_dir`"
+                    },
+                    {
+                      "name": "weeks_ranked",
+                      "expression": "`weeks_ranked`"
+                    },
+                    {
+                      "name": "best_rank",
+                      "expression": "`best_rank`"
+                    },
+                    {
+                      "name": "selected_flag",
+                      "expression": "`selected_flag`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Subevent Leaderboard — Top 20 This Week",
+                  "fields": []
+                },
+                "showDescription": true,
+                "description": {
+                  "value": "Selected pair highlighted",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "rowsPerPage": 20,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "current_rank",
+                    "displayName": "Rank",
+                    "headerAlignment": "center",
+                    "contentAlignment": "center",
+                    "style": {
+                      "type": "basic",
+                      "fontWeight": 700
+                    }
+                  },
+                  {
+                    "fieldName": "pair_name",
+                    "displayName": "Pair"
+                  },
+                  {
+                    "fieldName": "federations",
+                    "displayName": "Feds",
+                    "headerAlignment": "center",
+                    "contentAlignment": "center"
+                  },
+                  {
+                    "fieldName": "points",
+                    "displayName": "Points",
+                    "headerAlignment": "center",
+                    "contentAlignment": "center"
+                  },
+                  {
+                    "fieldName": "movement_label",
+                    "displayName": "Move",
+                    "headerAlignment": "center",
+                    "contentAlignment": "center",
+                    "style": {
+                      "type": "basic",
+                      "fontWeight": 700,
+                      "rules": [
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "UP"
+                            },
+                            "operator": "=",
+                            "fieldName": "movement_dir"
+                          },
+                          "foregroundColor": "#16A34A"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "DOWN"
+                            },
+                            "operator": "=",
+                            "fieldName": "movement_dir"
+                          },
+                          "foregroundColor": "#C1121F"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "NEW"
+                            },
+                            "operator": "=",
+                            "fieldName": "movement_dir"
+                          },
+                          "foregroundColor": "#1D4ED8"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "fieldName": "weeks_ranked",
+                    "displayName": "Wks",
+                    "headerAlignment": "center",
+                    "contentAlignment": "center"
+                  },
+                  {
+                    "fieldName": "best_rank",
+                    "displayName": "Best",
+                    "headerAlignment": "center",
+                    "contentAlignment": "center"
+                  },
+                  {
+                    "fieldName": "selected_flag",
+                    "displayName": " ",
+                    "headerAlignment": "center",
+                    "contentAlignment": "center",
+                    "style": {
+                      "type": "basic",
+                      "fontWeight": 700,
+                      "rules": [
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "SELECTED"
+                            },
+                            "operator": "=",
+                            "fieldName": "selected_flag"
+                          },
+                          "backgroundColor": "#C1121F",
+                          "foregroundColor": "#FFFFFF"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 25,
+            "width": 7,
+            "height": 9
+          }
+        },
+        {
+          "widget": {
+            "name": "pair_movers_bar",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "pair_movers",
+                  "fields": [
+                    {
+                      "name": "pair_name",
+                      "expression": "`pair_name`"
+                    },
+                    {
+                      "name": "sum(places_gained)",
+                      "expression": "SUM(`places_gained`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Biggest Climbers This Week",
+                  "fields": []
+                },
+                "showDescription": true,
+                "description": {
+                  "value": "Places gained vs previous week",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "sum(places_gained)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Places gained"
+                },
+                "y": {
+                  "fieldName": "pair_name",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Pair"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 7,
+            "y": 25,
+            "width": 5,
+            "height": 9
+          }
+        },
+        {
+          "widget": {
+            "name": "pair_longevity",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "pair_longevity",
+                  "fields": [
+                    {
+                      "name": "pair_name",
+                      "expression": "`pair_name`"
+                    },
+                    {
+                      "name": "federations",
+                      "expression": "`federations`"
+                    },
+                    {
+                      "name": "weeks_ranked",
+                      "expression": "`weeks_ranked`"
+                    },
+                    {
+                      "name": "weeks_in_top10",
+                      "expression": "`weeks_in_top10`"
+                    },
+                    {
+                      "name": "best_rank",
+                      "expression": "`best_rank`"
+                    },
+                    {
+                      "name": "ranked_since",
+                      "expression": "`ranked_since`"
+                    },
+                    {
+                      "name": "status",
+                      "expression": "`status`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Partnership Longevity",
+                  "fields": []
+                },
+                "showDescription": true,
+                "description": {
+                  "value": "Longest-running partnerships in this subevent (weeks ranked together)",
+                  "fields": []
+                }
+              },
+              "version": 2,
+              "rowsPerPage": 15,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "pair_name",
+                    "displayName": "Pair"
+                  },
+                  {
+                    "fieldName": "federations",
+                    "displayName": "Feds",
+                    "headerAlignment": "center",
+                    "contentAlignment": "center"
+                  },
+                  {
+                    "fieldName": "weeks_ranked",
+                    "displayName": "Weeks Ranked",
+                    "headerAlignment": "center",
+                    "contentAlignment": "center",
+                    "style": {
+                      "type": "basic",
+                      "fontWeight": 700
+                    }
+                  },
+                  {
+                    "fieldName": "weeks_in_top10",
+                    "displayName": "Wks Top 10",
+                    "headerAlignment": "center",
+                    "contentAlignment": "center"
+                  },
+                  {
+                    "fieldName": "best_rank",
+                    "displayName": "Best",
+                    "headerAlignment": "center",
+                    "contentAlignment": "center"
+                  },
+                  {
+                    "fieldName": "ranked_since",
+                    "displayName": "Since",
+                    "headerAlignment": "center",
+                    "contentAlignment": "center"
+                  },
+                  {
+                    "fieldName": "status",
+                    "displayName": "Status",
+                    "headerAlignment": "center",
+                    "contentAlignment": "center",
+                    "style": {
+                      "type": "basic",
+                      "fontWeight": 600,
+                      "rules": [
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "Active"
+                            },
+                            "operator": "=",
+                            "fieldName": "status"
+                          },
+                          "foregroundColor": "#16A34A"
+                        },
+                        {
+                          "condition": {
+                            "operand": {
+                              "type": "data-value",
+                              "value": "Inactive"
+                            },
+                            "operator": "=",
+                            "fieldName": "status"
+                          },
+                          "foregroundColor": "#94A3B8"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 34,
+            "width": 8,
+            "height": 8
+          }
+        },
+        {
+          "widget": {
+            "name": "pair_federation_mix",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "pair_federation_mix",
+                  "fields": [
+                    {
+                      "name": "partnership_type",
+                      "expression": "`partnership_type`"
+                    },
+                    {
+                      "name": "sum(pairs)",
+                      "expression": "SUM(`pairs`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "Federation Mix",
+                  "fields": []
+                },
+                "showDescription": true,
+                "description": {
+                  "value": "Currently ranked pairs: same vs cross-federation",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "sum(pairs)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Pairs"
+                },
+                "color": {
+                  "fieldName": "partnership_type",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Partnership"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 34,
+            "width": 4,
+            "height": 8
           }
         }
       ],

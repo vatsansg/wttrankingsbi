@@ -1,4 +1,8 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "6"
+# ///
 # MAGIC %md
 # MAGIC # Validate all gold tables
 # MAGIC Final task in the gold job. Runs after every dim, fact, and both views
@@ -10,7 +14,7 @@
 # MAGIC proportionate, lightweight scope as bronze's `09.Validate All Bronze
 # MAGIC Tables` and silver's `07.Validate All Silver Tables`.
 # MAGIC
-# MAGIC Check 4 below (`ALL_GOLD_VIEWS`) covers 17 views total: the original
+# MAGIC Check 4 below (`ALL_GOLD_VIEWS`) covers 22 views total (5 Phase 11B pair views added 2026-10-07): the original
 # MAGIC 8 latest-week snapshots from `09` plus the 9 full-history longitudinal
 # MAGIC views from `11` -- same `COUNT(*)` sanity check for both, since this
 # MAGIC validator only confirms a view resolves, not what it should contain (see
@@ -33,6 +37,19 @@
 # COMMAND ----------
 
 # MAGIC %run ../00-common/08.gold-helpers
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## 08. Gold helpers
+# MAGIC Shared by every Step 4 gold notebook. Unlike Silver's `resolve_identity`
+# MAGIC (which had to reconcile two different id spaces), every foreign key a
+# MAGIC gold fact carries -- `country_code`, `subevent_code`, `age_category_code`,
+# MAGIC `ittfid` -- already exists as a plain column on the silver source row.
+# MAGIC Building a fact here is carry-the-key-forward, not look-it-up: the actual
+# MAGIC join to a dimension happens later, at query/dashboard time, not while
+# MAGIC building the fact. So there is no gold equivalent of `resolve_identity` --
+# MAGIC just a metadata stamp, kept here for the same reason silver has one.
 
 # COMMAND ----------
 
@@ -65,6 +82,12 @@ ALL_GOLD_VIEWS = [
     "v_new_entrant_retention_curve",
     "v_doubles_partnership_longevity",
     "v_volatility_consistency_index",
+    # Phase 11B (2026-10-07) -- Pairs Performance page, built in 09.Gold Dashboard Views
+    "v_pair_profile",
+    "v_pair_ranking_history",
+    "v_pair_partner_doubles_individual_history",
+    "v_pair_partner_doubles_individual",
+    "v_pair_leaderboard",
 ]
 
 dbutils.widgets.text("p_ranking_year", "")
