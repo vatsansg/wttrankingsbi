@@ -44,3 +44,7 @@ connection_properties = {
     # every read regardless of table size or partitioning -- always set this.
     "fetchsize": "10000",
 }
+
+# COMMAND ----------
+
+print(connection_properties)

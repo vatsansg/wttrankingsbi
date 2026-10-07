@@ -1,4 +1,8 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "6"
+# ///
 # MAGIC %md
 # MAGIC ## 04. Bronze helpers -- JDBC (Azure SQL Server) sources
 # MAGIC Shared read/metadata/validation helpers for all 18 SQL-Server-sourced

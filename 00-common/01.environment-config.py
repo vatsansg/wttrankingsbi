@@ -60,9 +60,9 @@ landing_folder_path = '/Volumes/wttrankingsbi/landing/files'
 
 # COMMAND ----------
 
-sql_server_host = 'dbsvwtt-simulation.database.windows.net'
+sql_server_host = 'sqlserverranking.database.windows.net'
 sql_server_port = 1433
-sql_server_database = 'dbTableTennisUniverse_Ranking_RW37'
+sql_server_database = 'dbtabletennisuniverse_ranking'
 sql_server_source_schema = 'dbo'
 
 # Confirmed working setup (tested against dbsvwtt-simulation.database.windows.net):
@@ -78,5 +78,5 @@ sql_server_source_schema = 'dbo'
 #  that's just the naming choice that was used when this was set up; rename
 #  either one independently any time, they don't have to match)
 sql_server_secret_scope = 'wtt-ranking-db'
-sql_user = 'wttdbadmintest'
-sql_server_secret_password_key = 'wttdbadmintest'
+sql_user = 'wtt_root_oes'
+sql_server_secret_password_key = 'wtt_root_oes'
