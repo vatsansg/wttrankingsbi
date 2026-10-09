@@ -2,7 +2,7 @@
 # MAGIC %md
 # MAGIC # Build Dim Ranking Week
 # MAGIC Source: `silver.ranking_individuals` + `silver.ranking_pairs` +
-# MAGIC `silver.points_ledger`
+# MAGIC `silver.player_event_results` (Phase 12; was `silver.points_ledger`, now retired)
 # MAGIC
 # MAGIC Unlike every other gold dimension, there is no bronze/silver reference
 # MAGIC table for "ranking week" -- `ranking_year`/`ranking_week` are just data
@@ -44,7 +44,8 @@
 
 individuals_table = f"{catalog_name}.{silver_schema}.ranking_individuals"
 pairs_table = f"{catalog_name}.{silver_schema}.ranking_pairs"
-ledger_table = f"{catalog_name}.{silver_schema}.points_ledger"
+# Phase 12: silver.points_ledger is retired -- the events/results weeks now come from silver.player_event_results.
+ledger_table = f"{catalog_name}.{silver_schema}.player_event_results"
 target_table = f"{catalog_name}.{gold_schema}.dim_ranking_week"
 
 # COMMAND ----------

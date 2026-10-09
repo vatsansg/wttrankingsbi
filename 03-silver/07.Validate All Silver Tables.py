@@ -1,6 +1,14 @@
 # Databricks notebook source
 # MAGIC %md
 # MAGIC # Validate all silver tables
+# MAGIC
+# MAGIC > **Phase 12 (2026-10-08).** `silver.points_ledger` is retired and replaced by **`silver.player_event_results`**
+# MAGIC > (from the consolidated `bronze.players_events_results`). **`silver.events`** (event level) and
+# MAGIC > **`silver.events_metadata`** (row level) are added. Check 3 reports unmapped competitors in `player_event_results`
+# MAGIC > per ranking category as **WARN only**: unmapped IDs are shown on the dashboard as `ITTFID_<category>` buckets with a
+# MAGIC > drill-down (`gold.v_evt_unmapped_competitors`), so there is no threshold to maintain. Check 5 asserts the
+# MAGIC > `player_event_results` grain and the two events tables' keys are unique. EventsMetadata contract checks (constant
+# MAGIC > columns, duplicate keys) run in validator 09 for that week's events, and in full in `06-validation/02`.
 # MAGIC Final task in the silver transformation job. Runs after every silver
 # MAGIC notebook (identity dimension, the 4 bespoke tables, and the reference
 # MAGIC for-each) and fails the job loudly if any of the 17 silver tables is
@@ -36,7 +44,9 @@ ALL_SILVER_TABLES = [
     f"{catalog_name}.{silver_schema}.player_identity",
     f"{catalog_name}.{silver_schema}.ranking_individuals",
     f"{catalog_name}.{silver_schema}.ranking_pairs",
-    f"{catalog_name}.{silver_schema}.points_ledger",
+    f"{catalog_name}.{silver_schema}.player_event_results",   # Phase 12: replaces points_ledger
+    f"{catalog_name}.{silver_schema}.events",                 # Phase 12: event level (one row per event)
+    f"{catalog_name}.{silver_schema}.events_metadata",        # Phase 12: row level
     f"{catalog_name}.{silver_schema}.individuals_event_penalties",
 ] + [
     f"{catalog_name}.{silver_schema}.{table_key}" for table_key in sorted(SILVER_REFERENCE_TABLES)
@@ -77,7 +87,10 @@ null_key_checks = [
     (f"{catalog_name}.{silver_schema}.player_identity", "ittfid"),
     (f"{catalog_name}.{silver_schema}.ranking_individuals", "ittfid"),
     (f"{catalog_name}.{silver_schema}.ranking_pairs", "pair_id"),
-    (f"{catalog_name}.{silver_schema}.points_ledger", "ittfid"),
+    (f"{catalog_name}.{silver_schema}.player_event_results", "ittfid"),
+    (f"{catalog_name}.{silver_schema}.player_event_results", "event_id"),
+    (f"{catalog_name}.{silver_schema}.events", "event_id"),
+    (f"{catalog_name}.{silver_schema}.events_metadata", "event_id"),
 ]
 
 for full_table_name, key_col in null_key_checks:
@@ -98,38 +111,12 @@ for full_table_name, key_col in null_key_checks:
 # MAGIC stale/empty `bronze.competitors`), so it's still worth surfacing loudly.
 # MAGIC Threshold: fail if more than 5% of any table's rows are unresolved.
 # MAGIC
-# MAGIC **Known allowance -- `points_ledger` PAIR rows.** A production run
-# MAGIC confirmed a real, documented data-quality gap: `bronze.players_doubles`
-# MAGIC is missing ~35% of the *distinct pairs* `points_ledger` has ever
-# MAGIC referenced (9,342 of 26,624), because that bronze extract appears to be
-# MAGIC current/active-pairs only rather than the full historical
-# MAGIC `Players_Doubles` table -- see the README's "Pair identity coverage
-# MAGIC gap" section for the full diagnosis.
-# MAGIC
-# MAGIC The *row-level* percentage is higher than the distinct-id percentage
-# MAGIC (confirmed on a real run: 4,004,650 / 6,737,868 PAIR rows = 59.4%, not
-# MAGIC ~35%) -- expected, not a separate problem: missing pairs skew toward
-# MAGIC long-lived ones that accumulated far more historical rows before
-# MAGIC dropping out of an active-only extract (confirmed: unresolved pairs
-# MAGIC average ~429 rows/pair vs. ~158 rows/pair for resolved ones, and 73.5%
-# MAGIC of unresolved rows sit in `_log_archives`, the longest-history source).
-# MAGIC A pair active for 5+ years before retiring contributes far more ledger
-# MAGIC rows than one active for a single season, so a minority of *distinct*
-# MAGIC missing pairs still accounts for a majority of *rows*.
-# MAGIC
-# MAGIC The gap is 100% concentrated in `entity_type = 'PAIR'` (confirmed: 0
-# MAGIC unresolved `INDIVIDUAL` rows), so `points_ledger` is checked per
-# MAGIC `entity_type` below: `INDIVIDUAL` stays at the standard 5% threshold,
-# MAGIC `PAIR` gets a separate, explicit, higher threshold (set from the
-# MAGIC observed 59.4% plus a safety margin) so this *known, root-caused* issue
-# MAGIC doesn't fail every run until the source DB extract is fixed. Tighten
-# MAGIC `PAIR_KNOWN_GAP_THRESHOLD_PCT` back down to 5.0 once that extract pulls
-# MAGIC full pair history.
-# MAGIC
-# MAGIC **Step 11 note (per the Incremental_Load_Steps_7-11_Plan.docx review):**
-# MAGIC when comparing a parallel manual vs. orchestrated run, compare *absolute*
-# MAGIC unresolved counts for PAIR rows, not just this percentage gate -- a real
-# MAGIC regression could otherwise hide comfortably under this wide threshold.
+# MAGIC **`player_event_results` (Phase 12): WARN only, per ranking category.** WTT decided (2026-10-08) that unmapped
+# MAGIC competitors are shown, not blocked: on the dashboard each unmapped ID lands in a bucket `ITTFID_<category>`
+# MAGIC (individuals not in `Competitors`: MS/WS/MDI/WDI/XDI; pairs not in `Players_Doubles`: MD/WD/XD), with a drill-down
+# MAGIC listing the IDs (`gold.v_evt_unmapped_competitors`). This check prints the unmapped IDs, rows and % per ranking
+# MAGIC category every run and never fails, so there is no threshold or allowance to maintain. The old 65% PAIR allowance
+# MAGIC (measured on the retired `points_ledger`) is removed.
 
 # COMMAND ----------
 
@@ -140,7 +127,6 @@ identity_resolution_checks = [
 ]
 
 UNRESOLVED_THRESHOLD_PCT = 5.0
-PAIR_KNOWN_GAP_THRESHOLD_PCT = 65.0  # explicit allowance for the documented bronze.players_doubles coverage gap (observed 59.4% + margin) -- see README
 
 for full_table_name in identity_resolution_checks:
     df = spark.table(full_table_name)
@@ -155,33 +141,34 @@ for full_table_name in identity_resolution_checks:
     else:
         print(f"OK    {full_table_name}: {unresolved}/{total} rows ({pct:.1f}%) unresolved")
 
-points_ledger_table = f"{catalog_name}.{silver_schema}.points_ledger"
-points_ledger_df = spark.table(points_ledger_table)
+# Phase 12: unmapped competitors in player_event_results -> WARN per ranking category, never a failure.
+results_table = f"{catalog_name}.{silver_schema}.player_event_results"
+results_df = spark.table(results_table)
+# Checked against silver.player_identity as it is NOW (same lookup the gold views do at query time), so IDs added to
+# Competitors / Players_Doubles since their weeks were loaded are no longer reported.
+_known = (spark.table(f"{catalog_name}.{silver_schema}.player_identity").select("ittfid", "entity_type").distinct()
+               .withColumn("_known", F.lit(True)))
+_res = results_df.join(_known, ["ittfid", "entity_type"], "left").withColumn("_unmapped", F.col("_known").isNull())
+unmapped_stats = (_res.groupBy("ranking_category_code", "entity_type")
+                    .agg(F.count("*").alias("rows_"),
+                         F.sum(F.when(F.col("_unmapped"), 1).otherwise(0)).alias("unmapped_rows"),
+                         F.countDistinct(F.when(F.col("_unmapped"), F.col("ittfid"))).alias("unmapped_ids"))
+                    .orderBy("entity_type", "ranking_category_code").collect())
+for r in unmapped_stats:
+    pct = (r["unmapped_rows"] / r["rows_"] * 100) if r["rows_"] else 0.0
+    tag = "WARN" if r["unmapped_rows"] else "OK  "
+    print(f"{tag}  {results_table} [ITTFID_{r['ranking_category_code']}, {r['entity_type']}]: {r['unmapped_ids']:,} unmapped ID(s), "
+          f"{r['unmapped_rows']:,}/{r['rows_']:,} rows ({pct:.1f}%) -- drill-down: gold.v_evt_unmapped_competitors")
 
-for entity_type, threshold in [('INDIVIDUAL', UNRESOLVED_THRESHOLD_PCT), ('PAIR', PAIR_KNOWN_GAP_THRESHOLD_PCT)]:
-    subset = points_ledger_df.filter(F.col('entity_type') == entity_type)
-    total = subset.count()
-    unresolved = subset.filter(F.col('identity_resolved') == False).count()  # noqa: E712
-    pct = (unresolved / total * 100) if total else 0.0
-    label = f"{points_ledger_table} [{entity_type}]"
-    if pct > threshold:
-        failures.append(
-            f"{label}: {unresolved}/{total} rows ({pct:.1f}%) failed identity "
-            f"resolution -- exceeds the {threshold}% threshold"
-        )
-    else:
-        note = " (known bronze.players_doubles coverage gap -- see README)" if entity_type == 'PAIR' else ""
-        print(f"OK    {label}: {unresolved}/{total} rows ({pct:.1f}%) unresolved{note}")
-
-unmapped_subevent_count = points_ledger_df.filter(F.col('entity_type').isNull()).count()
-if unmapped_subevent_count > 0:
+unmapped_category_count = results_df.filter(F.col('entity_type').isNull()).count()
+if unmapped_category_count > 0:
     failures.append(
-        f"{points_ledger_table}: {unmapped_subevent_count} row(s) have an unmapped "
-        f"subevent_code (entity_type is null) -- INDIVIDUAL_SUBEVENTS/PAIR_SUBEVENTS "
-        f"in 04.Silver Points Ledger may need updating"
+        f"{results_table}: {unmapped_category_count} row(s) have an unmapped "
+        f"ranking_category_code (entity_type is null) -- PAIR_/INDIVIDUAL_RANKING_CATEGORIES "
+        f"in 08.Silver Player Event Results may need updating"
     )
 else:
-    print(f"OK    {points_ledger_table}: no rows with an unmapped subevent_code")
+    print(f"OK    {results_table}: no rows with an unmapped ranking_category_code")
 
 # COMMAND ----------
 
@@ -211,6 +198,55 @@ if HAVE_TARGET_WEEK:
             print(f"OK    {full_table_name}: target week ({target_year}, {target_week}) has {landed_count} row(s)")
 else:
     print("INFO  p_ranking_year/p_ranking_week not supplied -- skipping Check 4 (standalone run).")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC #### Check 5 - Phase 12: grain of `player_event_results` (target week) and `events_metadata`
+
+# COMMAND ----------
+
+per_table = f"{catalog_name}.{silver_schema}.player_event_results"
+per_scope = spark.table(per_table)
+if HAVE_TARGET_WEEK:
+    per_scope = per_scope.where(F.col("week_key") == int(v_ranking_year) * 100 + int(v_ranking_week))
+per_dups = (per_scope.groupBy("ittfid", "event_id", "subevent_code", "ranking_category_code", "age_category_code",
+                              "category_code", "result_position", "ranking_year", "ranking_week",
+                              "result_type", "result_slot")
+                     .count().filter(F.col("count") > 1).count())
+if per_dups:
+    failures.append(f"{per_table}: {per_dups} duplicated result key(s)")
+else:
+    print(f"OK    {per_table}: result grain unique" + (" in the target week" if HAVE_TARGET_WEEK else ""))
+
+# WARN: the counting flag must give one row per player x event x subevent x ranking category (Gold "how many" views).
+# By construction this is 0; a non-zero count means incremental runs drifted -> run 03-silver/08 with blank p_week_keys.
+COUNT_KEY = ["ittfid", "event_id", "subevent_code", "ranking_category_code"]
+_rr = spark.table(per_table).where(F.col("is_result_row"))
+rr_multi = _rr.groupBy(*COUNT_KEY).count().filter(F.col("count") > 1).count()
+if rr_multi:
+    print(f"WARN  {per_table}: {rr_multi} result(s) with more than one is_result_row -- run 03-silver/08 with blank p_week_keys (full rebuild)")
+else:
+    print(f"OK    {per_table}: one is_result_row per player x event x subevent x ranking category")
+# INFO: how many results changed age/category label over their life (these would double count without is_result_row).
+_relabel = (spark.table(per_table).where(F.col("is_first_appearance") & F.col("is_primary_copy"))
+                 .groupBy(*COUNT_KEY).count().filter(F.col("count") > 1).count())
+print(f"INFO  {per_table}: {_relabel:,} result(s) whose copies first appear in different weeks (counted once via is_result_row)")
+
+em_table = f"{catalog_name}.{silver_schema}.events_metadata"
+em_dups = (spark.table(em_table).groupBy("event_id", "ranking_category_code", "age_category_code")
+             .count().filter(F.col("count") > 1).count())
+if em_dups:
+    failures.append(f"{em_table}: {em_dups} duplicated (event_id, ranking_category_code, age_category_code) key(s) -- "
+                    f"03-silver/09 should have kept one row per key")
+else:
+    print(f"OK    {em_table}: (event_id, ranking_category_code, age_category_code) unique")
+ev_table = f"{catalog_name}.{silver_schema}.events"
+ev_dups = spark.table(ev_table).groupBy("event_id").count().filter(F.col("count") > 1).count()
+if ev_dups:
+    failures.append(f"{ev_table}: {ev_dups} duplicated event_id(s) -- 03-silver/09 should have kept one row per event")
+else:
+    print(f"OK    {ev_table}: one row per event_id")
 
 # COMMAND ----------
 

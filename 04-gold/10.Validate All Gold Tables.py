@@ -1,8 +1,4 @@
 # Databricks notebook source
-# /// script
-# [tool.databricks.environment]
-# environment_version = "6"
-# ///
 # MAGIC %md
 # MAGIC # Validate all gold tables
 # MAGIC Final task in the gold job. Runs after every dim, fact, and both views
@@ -14,7 +10,7 @@
 # MAGIC proportionate, lightweight scope as bronze's `09.Validate All Bronze
 # MAGIC Tables` and silver's `07.Validate All Silver Tables`.
 # MAGIC
-# MAGIC Check 4 below (`ALL_GOLD_VIEWS`) covers 22 views total (5 Phase 11B pair views added 2026-10-07): the original
+# MAGIC Check 4 below (`ALL_GOLD_VIEWS`) covers 40 views total (5 Phase 11B pair views added 2026-10-07; 18 Phase 12 event views added 2026-10-08): the original
 # MAGIC 8 latest-week snapshots from `09` plus the 9 full-history longitudinal
 # MAGIC views from `11` -- same `COUNT(*)` sanity check for both, since this
 # MAGIC validator only confirms a view resolves, not what it should contain (see
@@ -88,6 +84,25 @@ ALL_GOLD_VIEWS = [
     "v_pair_partner_doubles_individual_history",
     "v_pair_partner_doubles_individual",
     "v_pair_leaderboard",
+    # Phase 12 (2026-10-08) -- Events domain, built in 12.Gold Events Views
+    "v_evt_event_dim",
+    "v_evt_result_detail",
+    "v_evt_latest_week",
+    "v_evt_calendar_density",
+    "v_evt_tier_mix_trend",
+    "v_evt_player_timeline",
+    "v_evt_best_results_current",
+    "v_evt_points_per_tier",
+    "v_evt_stage_distribution",
+    "v_evt_qualifier_performance",
+    "v_evt_organization_share",
+    "v_evt_zpp_tracker",
+    "v_evt_mandatory_compliance",
+    "v_evt_first_senior_event",
+    "v_evt_win_rate_leaderboard",
+    "v_evt_event_summary",
+    "v_evt_kpis",
+    "v_evt_unmapped_competitors",
 ]
 
 dbutils.widgets.text("p_ranking_year", "")
@@ -148,7 +163,7 @@ for full_table_name, key_col in null_key_checks:
 # MAGIC succeeded. `dim_player`/`dim_pair` only contain Silver's *resolved*
 # MAGIC identity population, while `identity_resolved = false` fact rows are a
 # MAGIC real, accepted, non-zero rate under Step 3's own thresholds (5%
-# MAGIC individuals / 65% pairs -- see the Step 3 README's pair-identity-gap
+# MAGIC individuals; the Phase 12 results table only WARNs per ranking category -- see the Step 3 README's pair-identity-gap
 # MAGIC finding). So only the `ittfid` checks below exclude
 # MAGIC `identity_resolved = false` rows, the same accommodation Silver already
 # MAGIC makes -- otherwise this would hard-fail the Gold job on every single run.
@@ -243,6 +258,28 @@ for view_name in ALL_GOLD_VIEWS:
         print(f"OK    {full_view_name}: {row_count} rows")
     except Exception as e:
         failures.append(f"{full_view_name}: {e}")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC #### Check 4b - Phase 12: events metadata coverage (INFO / WARN only)
+# MAGIC Share of actual results whose event has `EventsMetadata` rows. Below 95% prints a WARN, because those results show
+# MAGIC tier and organisation "Not in EventsMetadata" on the dashboard (and "Event #<id>" if the event isn't in `dbo.Events`
+# MAGIC either). It is not a failure: the Ranking team's
+# MAGIC `EventsMetadata` may lag new events by a week.
+
+# COMMAND ----------
+
+try:
+    cov = spark.sql(f"SELECT metadata_coverage_pct FROM {catalog_name}.{gold_schema}.v_evt_kpis").collect()[0][0]
+    if cov is None:
+        print("INFO  events metadata coverage: no results yet")
+    elif cov < 95.0:
+        print(f"WARN  events metadata coverage {cov}% < 95% -- some results' events have no EventsMetadata rows (tier/organisation shown as 'Not in EventsMetadata')")
+    else:
+        print(f"OK    events metadata coverage {cov}%")
+except Exception as e:
+    failures.append(f"v_evt_kpis coverage check failed: {e}")
 
 # COMMAND ----------
 
